@@ -10,13 +10,13 @@ Nova AI is a responsive React chat application powered by Google's Gemini API. I
 
 ### Main workspace
 
-![Nova AI workspace screenshot](/Ai-Chatbot/screenshots/UI.png)
+![Nova AI workspace screenshot](screenshots/UI.png)
 
 <!-- _Add a screenshot of the empty-state workspace here._- -->
 
 ### Conversation view
 
-![Nova AI conversation screenshot](/Ai-Chatbot/screenshots/Converstion.png)
+![Nova AI conversation screenshot](screenshots/Converstion.png)
 
 <!-- _Add a screenshot showing a completed conversation and recent chats here._ -->
 

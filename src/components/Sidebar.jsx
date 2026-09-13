@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 import {
   Plus,
   Compass,
@@ -8,6 +10,9 @@ import {
   Sparkles,
   Globe2,
   MessageSquare,
+  User,
+  Settings,
+  LogOut,
 } from "lucide-react";
 
 function Sidebar({
@@ -16,6 +21,55 @@ function Sidebar({
   activeChatId,
   onSelectChat,
 }) {
+  // ================= PROFILE MENU =================
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+
+  // ================= CLOSE PROFILE ON OUTSIDE CLICK =================
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target)
+      ) {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
+    };
+  }, []);
+
+  // ================= MENU ACTIONS =================
+
+  const handleProfile = () => {
+    setProfileOpen(false);
+    console.log("Profile clicked");
+  };
+
+  const handleSettings = () => {
+    setProfileOpen(false);
+    console.log("Settings clicked");
+  };
+
+  const handleUpgrade = () => {
+    setProfileOpen(false);
+    console.log("Upgrade clicked");
+  };
+
+  const handleLogout = () => {
+    setProfileOpen(false);
+    console.log("Logout clicked");
+  };
+
   return (
     <aside
       className="
@@ -35,7 +89,9 @@ function Sidebar({
         dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)]
       "
     >
-      {/* ================= LOGO ================= */}
+      {/* ========================================================= */}
+      {/* LOGO */}
+      {/* ========================================================= */}
 
       <div className="mb-8 flex items-center gap-3 px-2">
         <div
@@ -87,9 +143,12 @@ function Sidebar({
         </div>
       </div>
 
-      {/* ================= NEW CHAT ================= */}
+      {/* ========================================================= */}
+      {/* NEW CHAT */}
+      {/* ========================================================= */}
 
       <button
+        type="button"
         onClick={onNewChat}
         className="
           group mb-7 flex w-full items-center justify-center gap-2
@@ -104,6 +163,7 @@ function Sidebar({
           hover:-translate-y-0.5
           hover:bg-white
           hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)]
+
           active:scale-[0.98]
 
           dark:border-white/10
@@ -131,7 +191,9 @@ function Sidebar({
         New Chat
       </button>
 
-      {/* ================= MENU ================= */}
+      {/* ========================================================= */}
+      {/* MENU */}
+      {/* ========================================================= */}
 
       <p
         className="
@@ -166,7 +228,9 @@ function Sidebar({
         />
       </div>
 
-      {/* ================= DIVIDER ================= */}
+      {/* ========================================================= */}
+      {/* DIVIDER */}
+      {/* ========================================================= */}
 
       <div
         className="
@@ -180,7 +244,9 @@ function Sidebar({
         "
       />
 
-      {/* ================= RECENT CHATS ================= */}
+      {/* ========================================================= */}
+      {/* RECENT CHATS */}
+      {/* ========================================================= */}
 
       <div className="mb-3 flex items-center justify-between px-2">
         <p
@@ -216,12 +282,12 @@ function Sidebar({
         )}
       </div>
 
+      {/* ========================================================= */}
       {/* CHAT LIST */}
+      {/* ========================================================= */}
 
       <div className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
         {chats.length === 0 ? (
-          /* EMPTY STATE */
-
           <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
             <div
               className="
@@ -260,10 +326,9 @@ function Sidebar({
             </p>
           </div>
         ) : (
-          /* REAL CHAT HISTORY */
-
           chats.map((chat) => (
             <button
+              type="button"
               key={chat.id}
               onClick={() => onSelectChat(chat.id)}
               className={`
@@ -314,7 +379,7 @@ function Sidebar({
                 <MessageSquare size={15} />
               </span>
 
-              {/* CHAT TITLE */}
+              {/* CHAT INFORMATION */}
 
               <div className="min-w-0 flex-1">
                 <p
@@ -365,7 +430,9 @@ function Sidebar({
         )}
       </div>
 
-      {/* ================= UPGRADE CARD ================= */}
+      {/* ========================================================= */}
+      {/* UPGRADE CARD */}
+      {/* ========================================================= */}
 
       <div
         className="
@@ -426,6 +493,8 @@ function Sidebar({
         </p>
 
         <button
+          type="button"
+          onClick={handleUpgrade}
           className="
             w-full rounded-xl
             bg-gray-900
@@ -435,8 +504,8 @@ function Sidebar({
             shadow-lg
             transition-all duration-200
 
-            hover:bg-gray-800
             hover:-translate-y-0.5
+            hover:bg-gray-800
 
             dark:bg-white
             dark:text-gray-900
@@ -447,28 +516,47 @@ function Sidebar({
         </button>
       </div>
 
-      {/* ================= USER ================= */}
+      {/* ========================================================= */}
+      {/* USER PROFILE */}
+      {/* ========================================================= */}
 
       <div
-        className="
-          rounded-2xl
-          border border-gray-200
-          bg-white/90
-          p-3
-          shadow-[0_8px_25px_rgba(0,0,0,0.06)]
-
-          transition-colors
-          duration-300
-
-          dark:border-white/10
-          dark:bg-white/5
-          dark:shadow-[0_8px_25px_rgba(0,0,0,0.25)]
-        "
+        ref={profileRef}
+        className="relative mt-2"
       >
-        <div className="flex items-center gap-3">
+        {/* PROFILE BUTTON */}
+
+        <button
+          type="button"
+          onClick={() => setProfileOpen((prev) => !prev)}
+          aria-expanded={profileOpen}
+          className="
+            flex w-full items-center gap-3
+            rounded-2xl
+            border border-gray-200
+            bg-white/90
+            p-3
+            text-left
+            shadow-[0_8px_25px_rgba(0,0,0,0.06)]
+            backdrop-blur-xl
+            transition-all duration-200
+
+            hover:-translate-y-0.5
+            hover:bg-white
+            hover:shadow-[0_12px_30px_rgba(0,0,0,0.09)]
+
+            dark:border-white/10
+            dark:bg-white/5
+            dark:shadow-[0_8px_25px_rgba(0,0,0,0.25)]
+            dark:hover:bg-white/10
+            dark:hover:shadow-[0_12px_30px_rgba(0,0,0,0.3)]
+          "
+        >
+          {/* AVATAR */}
+
           <div
             className="
-              relative flex h-11 w-11
+              relative flex h-11 w-11 shrink-0
               items-center justify-center
               rounded-full
               bg-gradient-to-br
@@ -498,9 +586,12 @@ function Sidebar({
             />
           </div>
 
-          <div className="flex-1">
+          {/* USER INFO */}
+
+          <div className="min-w-0 flex-1">
             <p
               className="
+                truncate
                 text-sm font-semibold
                 text-gray-900
 
@@ -512,7 +603,9 @@ function Sidebar({
 
             <p
               className="
-                text-xs text-gray-400
+                text-xs
+                text-gray-400
+
                 dark:text-gray-500
               "
             >
@@ -520,28 +613,238 @@ function Sidebar({
             </p>
           </div>
 
-          <button
-            className="
-              text-gray-400
-              transition
-              hover:text-gray-700
+          {/* MORE ICON */}
 
-              dark:hover:text-gray-200
+          <MoreVertical
+            size={18}
+            className={`
+              shrink-0
+              text-gray-400
+              transition-transform duration-200
+
+              dark:text-gray-500
+
+              ${
+                profileOpen
+                  ? "rotate-90 text-gray-700 dark:text-gray-200"
+                  : ""
+              }
+            `}
+          />
+        </button>
+
+        {/* ======================================================= */}
+        {/* PROFILE POPUP */}
+        {/* ======================================================= */}
+
+        {profileOpen && (
+          <div
+            className="
+              absolute
+              bottom-[calc(100%+10px)]
+              left-0
+              right-0
+              z-50
+
+              overflow-hidden
+              rounded-2xl
+
+              border border-gray-200
+              bg-white/95
+
+              p-2
+
+              shadow-[0_20px_50px_rgba(0,0,0,0.14)]
+              backdrop-blur-2xl
+
+              animate-[fadeIn_0.2s_ease-out]
+
+              dark:border-white/10
+              dark:bg-[#171a1d]/95
+              dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)]
             "
           >
-            <MoreVertical size={18} />
-          </button>
-        </div>
+            {/* POPUP HEADER */}
+
+            <div
+              className="
+                mb-2
+                flex items-center gap-3
+                rounded-xl
+                bg-gray-50
+                p-3
+
+                dark:bg-white/5
+              "
+            >
+              <div
+                className="
+                  flex h-9 w-9
+                  items-center justify-center
+                  rounded-full
+                  bg-gradient-to-br
+                  from-gray-200
+                  to-gray-400
+                  text-sm font-bold
+                  text-gray-700
+
+                  dark:from-gray-700
+                  dark:to-gray-900
+                  dark:text-white
+                "
+              >
+                Y
+              </div>
+
+              <div className="min-w-0">
+                <p
+                  className="
+                    truncate
+                    text-sm font-semibold
+                    text-gray-900
+
+                    dark:text-white
+                  "
+                >
+                  You
+                </p>
+
+                <p
+                  className="
+                    text-[11px]
+                    text-gray-400
+
+                    dark:text-gray-500
+                  "
+                >
+                  Free Plan
+                </p>
+              </div>
+            </div>
+
+            {/* PROFILE */}
+
+            <button
+              type="button"
+              onClick={handleProfile}
+              className="
+                flex w-full items-center gap-3
+                rounded-xl
+                px-3 py-2.5
+                text-sm font-medium
+                text-gray-700
+                transition-colors
+
+                hover:bg-gray-100
+
+                dark:text-gray-300
+                dark:hover:bg-white/10
+                dark:hover:text-white
+              "
+            >
+              <User size={17} />
+
+              Profile
+            </button>
+
+            {/* SETTINGS */}
+
+            <button
+              type="button"
+              onClick={handleSettings}
+              className="
+                flex w-full items-center gap-3
+                rounded-xl
+                px-3 py-2.5
+                text-sm font-medium
+                text-gray-700
+                transition-colors
+
+                hover:bg-gray-100
+
+                dark:text-gray-300
+                dark:hover:bg-white/10
+                dark:hover:text-white
+              "
+            >
+              <Settings size={17} />
+
+              Settings
+            </button>
+
+            {/* UPGRADE */}
+
+            <button
+              type="button"
+              onClick={handleUpgrade}
+              className="
+                flex w-full items-center gap-3
+                rounded-xl
+                px-3 py-2.5
+                text-sm font-medium
+                text-gray-700
+                transition-colors
+
+                hover:bg-gray-100
+
+                dark:text-gray-300
+                dark:hover:bg-white/10
+                dark:hover:text-white
+              "
+            >
+              <Sparkles size={17} />
+
+              Upgrade Plan
+            </button>
+
+            {/* DIVIDER */}
+
+            <div
+              className="
+                my-2 h-px
+                bg-gray-200
+
+                dark:bg-white/10
+              "
+            />
+
+            {/* LOGOUT */}
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="
+                flex w-full items-center gap-3
+                rounded-xl
+                px-3 py-2.5
+                text-sm font-medium
+                text-red-500
+                transition-colors
+
+                hover:bg-red-50
+
+                dark:hover:bg-red-500/10
+              "
+            >
+              <LogOut size={17} />
+
+              Log out
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );
 }
 
-/* ================= SIDEBAR ITEM ================= */
+/* ============================================================= */
+/* SIDEBAR ITEM */
+/* ============================================================= */
 
 function SidebarItem({ icon, text }) {
   return (
     <button
+      type="button"
       className="
         group flex w-full items-center gap-3
         rounded-xl

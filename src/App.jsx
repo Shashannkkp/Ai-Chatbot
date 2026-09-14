@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
+import { Menu } from "lucide-react";
+
 import Sidebar from "./components/Sidebar";
 import Chat from "./components/Chat";
 
 function App() {
-  // ================= CHAT HISTORY =================
+  // =========================================================
+  // CHATS
+  // =========================================================
 
   const [chats, setChats] = useState(() => {
     try {
       const savedChats = localStorage.getItem("nova-ai-chats");
+
       return savedChats ? JSON.parse(savedChats) : [];
     } catch (error) {
       console.error("Failed to load saved chats:", error);
@@ -15,15 +20,49 @@ function App() {
     }
   });
 
-  const [activeChatId, setActiveChatId] = useState(null);
+  // =========================================================
+  // ACTIVE CHAT
+  // =========================================================
 
-  // ================= DARK MODE =================
+  const [activeChatId, setActiveChatId] = useState(() => {
+    try {
+      const savedChats = localStorage.getItem("nova-ai-chats");
+
+      if (!savedChats) {
+        return null;
+      }
+
+      const parsedChats = JSON.parse(savedChats);
+
+      if (!Array.isArray(parsedChats) || parsedChats.length === 0) {
+        return null;
+      }
+
+      // Restore the most recent saved chat
+      return parsedChats[0].id;
+    } catch (error) {
+      console.error("Failed to restore active chat:", error);
+      return null;
+    }
+  });
+
+  // =========================================================
+  // DARK MODE
+  // =========================================================
 
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("nova-ai-dark-mode") === "true";
   });
 
-  // ================= APPLY DARK MODE =================
+  // =========================================================
+  // MOBILE SIDEBAR
+  // =========================================================
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // =========================================================
+  // DARK MODE EFFECT
+  // =========================================================
 
   useEffect(() => {
     localStorage.setItem("nova-ai-dark-mode", darkMode);
@@ -34,7 +73,9 @@ function App() {
     );
   }, [darkMode]);
 
-  // ================= SAVE CHATS =================
+  // =========================================================
+  // SAVE CHATS
+  // =========================================================
 
   useEffect(() => {
     try {
@@ -47,59 +88,136 @@ function App() {
     }
   }, [chats]);
 
-  // ================= NEW CHAT =================
+  // =========================================================
+  // VALIDATE ACTIVE CHAT
+  // =========================================================
+
+  useEffect(() => {
+    if (
+      activeChatId &&
+      !chats.some((chat) => chat.id === activeChatId)
+    ) {
+      setActiveChatId(
+        chats.length > 0 ? chats[0].id : null
+      );
+    }
+  }, [chats, activeChatId]);
+
+  // =========================================================
+  // NEW CHAT
+  // =========================================================
 
   const handleNewChat = () => {
     setActiveChatId(null);
+    setSidebarOpen(false);
   };
 
-  // ================= SELECT CHAT =================
+  // =========================================================
+  // SELECT CHAT
+  // =========================================================
 
   const handleSelectChat = (chatId) => {
     setActiveChatId(chatId);
+    setSidebarOpen(false);
   };
 
-  // ================= UPDATE CHAT =================
+  // =========================================================
+  // UPDATE / CREATE CHAT
+  // =========================================================
 
   const handleUpdateChat = (updatedChat) => {
+    const chatWithTimestamp = {
+      ...updatedChat,
+      updatedAt: new Date().toISOString(),
+    };
+
     setChats((prevChats) => {
       const existingChat = prevChats.find(
-        (chat) => chat.id === updatedChat.id
+        (chat) => chat.id === chatWithTimestamp.id
       );
 
+      // Existing chat:
+      // remove it from its old position
+      // and move it to the top.
       if (existingChat) {
-        return prevChats.map((chat) =>
-          chat.id === updatedChat.id
-            ? updatedChat
-            : chat
+        const otherChats = prevChats.filter(
+          (chat) => chat.id !== chatWithTimestamp.id
         );
+
+        return [chatWithTimestamp, ...otherChats];
       }
 
-      return [
-        updatedChat,
-        ...prevChats,
-      ];
+      // New chat is added at the top.
+      return [chatWithTimestamp, ...prevChats];
     });
 
-    setActiveChatId(updatedChat.id);
+    setActiveChatId(chatWithTimestamp.id);
   };
 
-  // ================= ACTIVE CHAT =================
+  // =========================================================
+  // DELETE CHAT
+  // =========================================================
+
+  const handleDeleteChat = (chatId) => {
+    console.log("Deleting chat:", chatId);
+
+    setChats((prevChats) => {
+      return prevChats.filter(
+        (chat) => chat.id !== chatId
+      );
+    });
+
+    // The active-chat validation effect
+    // will automatically select another chat.
+  };
+
+  // =========================================================
+  // DELETE ALL CHATS
+  // =========================================================
+
+  const handleDeleteAllChats = () => {
+    console.log("Deleting all chats");
+
+    setChats([]);
+    setActiveChatId(null);
+  };
+
+  // =========================================================
+  // RENAME CHAT
+  // =========================================================
+
+  const handleRenameChat = (chatId, newTitle) => {
+    setChats((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === chatId
+          ? {
+              ...chat,
+              title: newTitle,
+              updatedAt: new Date().toISOString(),
+            }
+          : chat
+      )
+    );
+  };
+
+  // =========================================================
+  // ACTIVE CHAT
+  // =========================================================
 
   const activeChat = chats.find(
     (chat) => chat.id === activeChatId
   );
 
-  // ================= UI =================
+  // =========================================================
+  // UI
+  // =========================================================
 
   return (
     <div
       className="
         min-h-[100dvh]
         w-full
-
         bg-[#eef0f2]
-
         p-0
 
         transition-colors
@@ -111,26 +229,28 @@ function App() {
         md:p-4
       "
     >
+      {/* ===================================================== */}
+      {/* BACKGROUND EFFECTS */}
+      {/* ===================================================== */}
 
-      {/* ================= AMBIENT BACKGROUND ================= */}
-
-      <div className="pointer-events-none fixed inset-0 -z-0 overflow-hidden">
-
-        {/* TOP LEFT GLOW */}
-
+      <div
+        className="
+          pointer-events-none
+          fixed
+          inset-0
+          -z-0
+          overflow-hidden
+        "
+      >
         <div
           className="
             absolute
             -left-32
             -top-32
-
             h-72
             w-72
-
             rounded-full
-
             bg-white/80
-
             blur-3xl
 
             transition-colors
@@ -143,21 +263,15 @@ function App() {
           "
         />
 
-        {/* BOTTOM RIGHT GLOW */}
-
         <div
           className="
             absolute
             -bottom-32
             -right-32
-
             h-72
             w-72
-
             rounded-full
-
             bg-gray-300/40
-
             blur-3xl
 
             transition-colors
@@ -169,28 +283,21 @@ function App() {
             sm:w-96
           "
         />
-
       </div>
 
-      {/* ================= MAIN GLASS CONTAINER ================= */}
+      {/* ===================================================== */}
+      {/* MAIN CONTAINER */}
+      {/* ===================================================== */}
 
       <div
         className="
           relative
-
           flex
-          flex-col
-          sm:flex-row
-
           min-h-[100dvh]
-          sm:h-[calc(100dvh-24px)]
-
           w-full
-
           overflow-hidden
 
           rounded-none
-
           border-0
 
           bg-white/70
@@ -202,51 +309,107 @@ function App() {
           transition-colors
           duration-300
 
-          dark:bg-[#111416]/90
           dark:border-white/10
+          dark:bg-[#111416]/90
 
+          sm:h-[calc(100dvh-24px)]
+          sm:flex-row
           sm:rounded-[24px]
-
           sm:border
           sm:border-white/80
-
           sm:shadow-[0_25px_80px_rgba(0,0,0,0.08)]
 
           md:rounded-[28px]
         "
       >
+        {/* =================================================== */}
+        {/* MOBILE MENU BUTTON */}
+        {/* =================================================== */}
 
-        {/* ================= SIDEBAR ================= */}
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open sidebar"
+          className="
+            fixed
+            left-4
+            top-4
+            z-30
+
+            flex
+            h-11
+            w-11
+            items-center
+            justify-center
+
+            rounded-xl
+
+            border
+            border-gray-200
+
+            bg-white/90
+
+            text-gray-700
+
+            shadow-[0_8px_25px_rgba(0,0,0,0.08)]
+
+            backdrop-blur-xl
+
+            transition-all
+            duration-200
+
+            hover:bg-white
+            hover:shadow-[0_10px_30px_rgba(0,0,0,0.12)]
+
+            active:scale-95
+
+            dark:border-white/10
+            dark:bg-[#171a1d]/90
+            dark:text-white
+
+            sm:hidden
+          "
+        >
+          <Menu size={21} />
+        </button>
+
+        {/* =================================================== */}
+        {/* SIDEBAR */}
+        {/* =================================================== */}
 
         <Sidebar
           onNewChat={handleNewChat}
           chats={chats}
           activeChatId={activeChatId}
           onSelectChat={handleSelectChat}
+          onDeleteChat={handleDeleteChat}
+          onDeleteAllChats={handleDeleteAllChats}
+          onRenameChat={handleRenameChat}
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
         />
 
-        {/* ================= CHAT ================= */}
+        {/* =================================================== */}
+        {/* CHAT */}
+        {/* =================================================== */}
 
         <main
           className="
-            min-w-0
             min-h-0
+            min-w-0
+            w-full
             flex-1
             overflow-hidden
           "
         >
-
           <Chat
             chat={activeChat}
             onUpdateChat={handleUpdateChat}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
           />
-
         </main>
-
       </div>
-
     </div>
   );
 }

@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   Globe2,
-  Search,
   MoreVertical,
   Sparkles,
   Sun,
   Moon,
+  Code2,
+  Lightbulb,
+  BookOpen,
+  PenLine,
 } from "lucide-react";
 
 import ChatInput from "./ChatInput";
@@ -19,32 +22,86 @@ function Chat({
   darkMode,
   setDarkMode,
 }) {
-  const [messages, setMessages] = useState(
-    chat?.messages || []
-  );
-
-  const [isLoading, setIsLoading] = useState(false);
+  const [messages, setMessages] = useState(chat?.messages || []);
+  const [loading, setLoading] = useState(false);
 
   const messagesEndRef = useRef(null);
 
-  // ================= LOAD SELECTED CHAT =================
+  // ================================
+  // LOAD ACTIVE CHAT
+  // ================================
 
   useEffect(() => {
     setMessages(chat?.messages || []);
   }, [chat]);
 
-  // ================= AUTO SCROLL =================
+  // ================================
+  // AUTO SCROLL
+  // ================================
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [messages, isLoading]);
+  }, [messages, loading]);
 
-  // ================= SEND MESSAGE =================
+  // ================================
+  // GENERATE CHAT TITLE
+  // ================================
 
-  const handleSendMessage = async (text) => {
-    if (!text.trim() || isLoading) return;
+  const generateChatTitle = (text) => {
+    const cleanText = text
+      .trim()
+      .replace(/\s+/g, " ");
+
+    if (cleanText.length <= 40) {
+      return cleanText;
+    }
+
+    return `${cleanText.substring(0, 40).trim()}...`;
+  };
+
+  // ================================
+  // UPDATE EXISTING CHAT
+  // ================================
+
+  const updateChat = (updatedMessages) => {
+    setMessages(updatedMessages);
+
+    if (chat) {
+      onUpdateChat({
+        ...chat,
+        messages: updatedMessages,
+      });
+    }
+  };
+
+  // ================================
+  // EDIT MESSAGE
+  // ================================
+
+  const handleEditMessage = (message, newText) => {
+    if (!chat) return;
+
+    const updatedMessages = messages.map((item) =>
+      item.id === message.id
+        ? {
+            ...item,
+            text: newText,
+            timestamp: new Date().toISOString(),
+          }
+        : item
+    );
+
+    updateChat(updatedMessages);
+  };
+
+  // ================================
+  // SEND MESSAGE
+  // ================================
+
+  const sendMessage = async (text) => {
+    if (!text.trim() || loading) return;
 
     const cleanText = text.trim();
 
@@ -60,41 +117,62 @@ function Chat({
       userMessage,
     ];
 
-    setMessages(updatedMessages);
-    setIsLoading(true);
+    // ==========================================
+    // CREATE NEW CHAT
+    // ==========================================
 
-    // Create chat ID if this is a new conversation
-    const chatId = chat?.id || Date.now();
+    let currentChatId = chat?.id;
 
-    // First user message becomes chat title
-    const title =
-      chat?.title ||
-      cleanText.slice(0, 30) +
-        (cleanText.length > 30 ? "..." : "");
+    if (!chat) {
+      currentChatId = Date.now();
+
+      const newChat = {
+        id: currentChatId,
+        title: generateChatTitle(cleanText),
+        messages: updatedMessages,
+      };
+
+      setMessages(updatedMessages);
+      onUpdateChat(newChat);
+    } else {
+      updateChat(updatedMessages);
+    }
+
+    setLoading(true);
 
     try {
+      // ==========================================
+      // CALL BACKEND
+      // ==========================================
+
       const response = await fetch(API_URL, {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           message: cleanText,
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Server error");
+        throw new Error(
+          data?.error || "Failed to get response"
+        );
       }
 
-      const data = await response.json();
+      // ==========================================
+      // AI MESSAGE
+      // ==========================================
 
       const aiMessage = {
         id: Date.now() + 1,
         sender: "ai",
-        text: data.reply,
+        text:
+          data?.reply ||
+          "I couldn't generate a response right now.",
         timestamp: new Date().toISOString(),
       };
 
@@ -103,21 +181,33 @@ function Chat({
         aiMessage,
       ];
 
-      setMessages(finalMessages);
+      // ==========================================
+      // SAVE AI RESPONSE
+      // ==========================================
 
-      // Save / update chat
-      onUpdateChat({
-        id: chatId,
-        title,
-        messages: finalMessages,
-      });
+      if (!chat) {
+        onUpdateChat({
+          id: currentChatId,
+          title: generateChatTitle(cleanText),
+          messages: finalMessages,
+        });
+
+        setMessages(finalMessages);
+      } else {
+        updateChat(finalMessages);
+      }
     } catch (error) {
       console.error("Chat error:", error);
+
+      // ==========================================
+      // ERROR MESSAGE
+      // ==========================================
 
       const errorMessage = {
         id: Date.now() + 1,
         sender: "ai",
-        text: "Sorry, something went wrong. Please try again.",
+        text:
+          "Sorry, something went wrong. Please try again.",
         timestamp: new Date().toISOString(),
       };
 
@@ -126,878 +216,658 @@ function Chat({
         errorMessage,
       ];
 
-      setMessages(finalMessages);
+      if (!chat) {
+        onUpdateChat({
+          id: currentChatId,
+          title: generateChatTitle(cleanText),
+          messages: finalMessages,
+        });
 
-      // Save even if API fails
-      onUpdateChat({
-        id: chatId,
-        title,
-        messages: finalMessages,
-      });
+        setMessages(finalMessages);
+      } else {
+        updateChat(finalMessages);
+      }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // ================= QUICK ACTIONS =================
+  // ================================
+  // QUICK ACTION
+  // ================================
 
-  const quickActions = [
-    "Explain React",
-    "Write some code",
-    "Give me project ideas",
-  ];
+  const handleQuickAction = (prompt) => {
+    sendMessage(prompt);
+  };
 
   return (
     <div
       className="
-        flex
-        h-full
-        min-w-0
-        flex-col
-
-        bg-white/45
-
-        transition-colors
-        duration-300
-
-        dark:bg-[#0f1214]/80
+        flex h-full min-h-0 flex-col
+        bg-transparent
       "
     >
-
-      {/* ================================================= */}
-      {/* HEADER */}
-      {/* ================================================= */}
+      {/* ================= HEADER ================= */}
 
       <header
         className="
-          flex
-          h-[70px]
-          shrink-0
-          items-center
-          justify-between
-
-          border-b
-          border-gray-200/70
-
-          bg-white/65
-
-          px-3
-
-          backdrop-blur-2xl
-
-          transition-colors
-          duration-300
-
+          flex h-[72px] shrink-0
+          items-center justify-between
+          border-b border-gray-200/70
+          bg-white/50
+          px-4
+          backdrop-blur-xl
           dark:border-white/10
-          dark:bg-[#111416]/85
-
-          sm:h-[78px]
-          sm:px-5
-
-          md:px-7
+          dark:bg-[#111416]/60
+          sm:px-6
         "
       >
+        {/* LEFT */}
 
-        {/* ================= LEFT SIDE ================= */}
-
-        <div className="flex min-w-0 items-center gap-3">
-
-          {/* LOGO */}
-
+        <div className="flex items-center gap-3">
           <div
             className="
-              relative
-              flex
-              h-10
-              w-10
-              shrink-0
-              items-center
-              justify-center
-              rounded-2xl
-
-              border
-              border-white
-
-              bg-gradient-to-br
-              from-gray-100
-              to-gray-300
-
-              text-gray-700
-
-              shadow-[inset_0_1px_2px_white,0_8px_20px_rgba(0,0,0,0.08)]
-
-              transition-colors
-              duration-300
-
+              flex h-10 w-10
+              items-center justify-center
+              rounded-xl
+              border border-gray-200/80
+              bg-white
+              text-gray-500
+              shadow-sm
               dark:border-white/10
-              dark:from-gray-700
-              dark:to-gray-900
-              dark:text-white
-
-              sm:h-11
-              sm:w-11
+              dark:bg-white/[0.06]
+              dark:text-gray-300
             "
           >
-
             <Globe2
               size={20}
-              strokeWidth={1.7}
+              strokeWidth={1.6}
             />
-
-            {/* ONLINE DOT */}
-
-            <span
-              className="
-                absolute
-                right-0
-                top-0
-                h-3
-                w-3
-                rounded-full
-                border-2
-                border-white
-                bg-emerald-400
-
-                dark:border-[#111416]
-              "
-            />
-
           </div>
 
-          {/* TITLE */}
-
-          <div className="min-w-0">
-
-            <h2
+          <div>
+            <h1
               className="
-                truncate
-                text-base
-                font-bold
-                text-black
-
-                transition-colors
-                duration-300
-
+                text-sm
+                font-semibold
+                tracking-tight
+                text-gray-900
                 dark:text-white
-
-                sm:text-lg
+                sm:text-base
               "
             >
-              Nova Ai
-            </h2>
+              Nova AI
+            </h1>
 
-            <div className="flex items-center gap-1">
-
-              <span className="text-[9px] text-emerald-500">
-                ●
-              </span>
-
-              <span
-                className="
-                  text-xs
-                  text-gray-400
-
-                  dark:text-gray-500
-
-                  sm:text-sm
-                "
-              >
-                Online
-              </span>
-
-            </div>
-
+            <p
+              className="
+                text-[11px]
+                text-gray-400
+                dark:text-gray-500
+                sm:text-xs
+              "
+            >
+              AI Assistant
+            </p>
           </div>
-
         </div>
 
-        {/* ================= RIGHT SIDE ================= */}
+        {/* RIGHT */}
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
-
-          {/* SEARCH */}
+        <div className="flex items-center gap-1">
+          {/* DARK MODE */}
 
           <button
-            title="Search"
+            type="button"
+            onClick={() => setDarkMode(!darkMode)}
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode"
             className="
-              hidden
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-xl
-
-              border
-              border-gray-200
-
-              bg-white/70
-
-              text-black
-
-              shadow-sm
-
+              flex h-9 w-9
+              items-center justify-center
+              rounded-lg
+              text-gray-500
               transition-all
               duration-200
-
-              hover:-translate-y-0.5
-              hover:bg-white
-              hover:shadow-md
-
-              dark:border-white/10
-              dark:bg-white/5
-              dark:text-white
+              hover:bg-gray-100
+              hover:text-gray-800
+              active:scale-95
+              dark:text-gray-400
               dark:hover:bg-white/10
-
-              sm:flex
+              dark:hover:text-white
             "
           >
-            <Search size={17} />
-          </button>
-
-          {/* ================= DARK MODE ================= */}
-
-          <button
-            onClick={() =>
-              setDarkMode((prev) => !prev)
-            }
-            title={
-              darkMode
-                ? "Switch to light mode"
-                : "Switch to dark mode"
-            }
-            aria-label={
-              darkMode
-                ? "Switch to light mode"
-                : "Switch to dark mode"
-            }
-            className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-xl
-
-              border
-              border-gray-200
-
-              bg-white/70
-
-              text-black
-
-              shadow-sm
-
-              transition-all
-              duration-300
-
-              hover:-translate-y-0.5
-              hover:bg-white
-              hover:shadow-md
-
-              dark:border-white/10
-              dark:bg-white/5
-              dark:text-white
-              dark:hover:bg-white/10
-
-              sm:h-10
-              sm:w-10
-            "
-          >
-
             {darkMode ? (
-              <Sun
-                size={17}
-                className="transition-transform duration-300"
-              />
+              <Sun size={18} />
             ) : (
-              <Moon
-                size={17}
-                className="transition-transform duration-300"
-              />
+              <Moon size={18} />
             )}
-
           </button>
 
           {/* MORE */}
 
           <button
-            title="More"
+            type="button"
+            aria-label="More options"
+            title="More options"
             className="
-              hidden
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-xl
-
-              border
-              border-gray-200
-
-              bg-white/70
-
-              text-black
-
-              shadow-sm
-
+              flex h-9 w-9
+              items-center justify-center
+              rounded-lg
+              text-gray-500
               transition-all
               duration-200
-
-              hover:-translate-y-0.5
-              hover:bg-white
-              hover:shadow-md
-
-              dark:border-white/10
-              dark:bg-white/5
-              dark:text-white
+              hover:bg-gray-100
+              hover:text-gray-800
+              active:scale-95
+              dark:text-gray-400
               dark:hover:bg-white/10
-
-              sm:flex
+              dark:hover:text-white
             "
           >
-            <MoreVertical size={17} />
+            <MoreVertical size={18} />
           </button>
-
-          {/* PROFILE */}
-
-          <button
-            title="Profile"
-            className="
-              flex
-              h-10
-              w-10
-              shrink-0
-              items-center
-              justify-center
-              rounded-full
-
-              border
-              border-white
-
-              bg-gradient-to-br
-              from-gray-200
-              to-gray-400
-
-              text-sm
-              font-bold
-              text-black
-
-              shadow-[0_8px_20px_rgba(0,0,0,0.1)]
-
-              transition-all
-              duration-200
-
-              hover:-translate-y-0.5
-
-              dark:border-white/10
-              dark:from-gray-700
-              dark:to-gray-900
-              dark:text-white
-
-              sm:h-11
-              sm:w-11
-            "
-          >
-            Y
-          </button>
-
         </div>
-
       </header>
 
-      {/* ================================================= */}
-      {/* CHAT AREA */}
-      {/* ================================================= */}
+      {/* ================= CHAT AREA ================= */}
 
       <div
         className="
-          relative
+          min-h-0
           flex-1
           overflow-y-auto
-
-          bg-gradient-to-br
-          from-white
-          via-[#f7f8f9]
-          to-[#eceff1]
-
-          transition-colors
-          duration-300
-
-          dark:from-[#0b0d0f]
-          dark:via-[#101315]
-          dark:to-[#15191c]
+          px-3
+          py-5
+          sm:px-5
+          sm:py-6
+          md:px-8
         "
       >
+        {messages.length === 0 ? (
+          /* ================= WELCOME SCREEN ================= */
 
-        {/* ================= GLOSSY BACKGROUND ================= */}
-
-        <div
-          className="
-            pointer-events-none
-            absolute
-            left-1/2
-            top-10
-            h-72
-            w-72
-            -translate-x-1/2
-            rounded-full
-            bg-white/90
-            blur-3xl
-
-            dark:bg-white/[0.025]
-
-            sm:h-96
-            sm:w-96
-          "
-        />
-
-        <div
-          className="
-            pointer-events-none
-            absolute
-            bottom-0
-            left-1/2
-            h-60
-            w-[400px]
-            -translate-x-1/2
-            rounded-full
-            bg-gray-200/50
-            blur-3xl
-
-            dark:bg-gray-700/10
-
-            sm:w-[500px]
-          "
-        />
-
-        {/* ================= CONTENT ================= */}
-
-        <div
-          className="
-            relative
-            mx-auto
-            flex
-            min-h-full
-            max-w-6xl
-            flex-col
-
-            px-4
-            py-7
-
-            sm:px-5
-            sm:py-10
-
-            md:px-10
-          "
-        >
-
-          {/* ================================================= */}
-          {/* WELCOME SCREEN */}
-          {/* ================================================= */}
-
-          {messages.length === 0 && (
+          <div
+            className="
+              flex
+              min-h-full
+              flex-col
+              items-center
+              justify-center
+              px-2
+              pb-10
+              text-center
+              animate-[fadeInUp_0.5s_ease-out]
+            "
+          >
+            {/* ICON */}
 
             <div
               className="
-                flex
-                flex-1
-                flex-col
-                items-center
-                justify-center
-                text-center
+                mb-5
+                flex h-16 w-16
+                items-center justify-center
+                rounded-2xl
+                border border-gray-200
+                bg-white
+                text-gray-600
+                shadow-[0_10px_35px_rgba(0,0,0,0.08)]
+                dark:border-white/10
+                dark:bg-white/[0.06]
+                dark:text-gray-200
+                sm:h-20
+                sm:w-20
               "
             >
+              <Sparkles
+                size={30}
+                strokeWidth={1.5}
+                className="sm:h-9 sm:w-9"
+              />
+            </div>
 
-              {/* AI LOGO */}
+            {/* TITLE */}
 
-              <div className="relative mb-6 sm:mb-7">
+            <h1>
+              Hey, I'm{" "}
+              <span className="text-emerald-500">
+                Nova
+              </span>
+              . How can I help you today?
+            </h1>
+
+            <p
+              className="
+                mt-2
+                max-w-md
+                text-sm
+                leading-6
+                text-gray-500
+                dark:text-gray-400
+                sm:text-[15px]
+              "
+            >
+              Ask me anything, explore ideas, write code,
+              or get help with your next project.
+            </p>
+
+            {/* QUICK ACTIONS */}
+
+            <div
+              className="
+                mt-8
+                grid
+                w-full
+                max-w-2xl
+                grid-cols-1
+                gap-3
+                sm:grid-cols-2
+              "
+            >
+              {/* REACT */}
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleQuickAction(
+                    "Explain React.js in simple terms."
+                  )
+                }
+                className="
+                  group
+                  flex
+                  items-center
+                  gap-3
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-white/80
+                  p-4
+                  text-left
+                  shadow-sm
+                  backdrop-blur-xl
+                  transition-all
+                  duration-200
+                  hover:-translate-y-0.5
+                  hover:shadow-md
+                  active:scale-[0.98]
+                  dark:border-white/10
+                  dark:bg-white/[0.04]
+                  dark:hover:bg-white/[0.07]
+                "
+              >
+                <Code2
+                  size={19}
+                  className="
+                    shrink-0
+                    text-gray-500
+                    transition-transform
+                    duration-200
+                    group-hover:scale-110
+                    dark:text-gray-300
+                  "
+                />
+
+                <span
+                  className="
+                    text-sm
+                    font-medium
+                    text-gray-700
+                    dark:text-gray-300
+                  "
+                >
+                  Explain React.js
+                </span>
+              </button>
+
+              {/* PROJECT IDEAS */}
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleQuickAction(
+                    "Give me some creative ideas for a web development project."
+                  )
+                }
+                className="
+                  group
+                  flex
+                  items-center
+                  gap-3
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-white/80
+                  p-4
+                  text-left
+                  shadow-sm
+                  backdrop-blur-xl
+                  transition-all
+                  duration-200
+                  hover:-translate-y-0.5
+                  hover:shadow-md
+                  active:scale-[0.98]
+                  dark:border-white/10
+                  dark:bg-white/[0.04]
+                  dark:hover:bg-white/[0.07]
+                "
+              >
+                <Lightbulb
+                  size={19}
+                  className="
+                    shrink-0
+                    text-gray-500
+                    transition-transform
+                    duration-200
+                    group-hover:scale-110
+                    dark:text-gray-300
+                  "
+                />
+
+                <span
+                  className="
+                    text-sm
+                    font-medium
+                    text-gray-700
+                    dark:text-gray-300
+                  "
+                >
+                  Give me project ideas
+                </span>
+              </button>
+
+              {/* JAVASCRIPT */}
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleQuickAction(
+                    "Teach me an important JavaScript concept."
+                  )
+                }
+                className="
+                  group
+                  flex
+                  items-center
+                  gap-3
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-white/80
+                  p-4
+                  text-left
+                  shadow-sm
+                  backdrop-blur-xl
+                  transition-all
+                  duration-200
+                  hover:-translate-y-0.5
+                  hover:shadow-md
+                  active:scale-[0.98]
+                  dark:border-white/10
+                  dark:bg-white/[0.04]
+                  dark:hover:bg-white/[0.07]
+                "
+              >
+                <BookOpen
+                  size={19}
+                  className="
+                    shrink-0
+                    text-gray-500
+                    transition-transform
+                    duration-200
+                    group-hover:scale-110
+                    dark:text-gray-300
+                  "
+                />
+
+                <span
+                  className="
+                    text-sm
+                    font-medium
+                    text-gray-700
+                    dark:text-gray-300
+                  "
+                >
+                  Teach me JavaScript
+                </span>
+              </button>
+
+              {/* WRITING */}
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleQuickAction(
+                    "Help me write a professional message."
+                  )
+                }
+                className="
+                  group
+                  flex
+                  items-center
+                  gap-3
+                  rounded-xl
+                  border
+                  border-gray-200
+                  bg-white/80
+                  p-4
+                  text-left
+                  shadow-sm
+                  backdrop-blur-xl
+                  transition-all
+                  duration-200
+                  hover:-translate-y-0.5
+                  hover:shadow-md
+                  active:scale-[0.98]
+                  dark:border-white/10
+                  dark:bg-white/[0.04]
+                  dark:hover:bg-white/[0.07]
+                "
+              >
+                <PenLine
+                  size={19}
+                  className="
+                    shrink-0
+                    text-gray-500
+                    transition-transform
+                    duration-200
+                    group-hover:scale-110
+                    dark:text-gray-300
+                  "
+                />
+
+                <span
+                  className="
+                    text-sm
+                    font-medium
+                    text-gray-700
+                    dark:text-gray-300
+                  "
+                >
+                  Help me write
+                </span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* ================= MESSAGES ================= */
+
+          <div
+            className="
+              mx-auto
+              flex
+              w-full
+              max-w-5xl
+              flex-col
+              gap-5
+              pb-4
+              sm:gap-6
+            "
+          >
+            {messages.map((message) => (
+              <Message
+                key={message.id}
+                message={message}
+                onEditMessage={handleEditMessage}
+              />
+            ))}
+
+            {/* ================= THINKING INDICATOR ================= */}
+
+            {loading && (
+              <div
+                className="
+                  flex
+                  items-start
+                  gap-2.5
+                  animate-[fadeInUp_0.35s_ease-out]
+                  sm:gap-3
+                "
+              >
+                {/* AI ICON */}
+
+                <div
+                  className="
+                    relative
+                    mt-1
+                    flex h-9 w-9
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-xl
+                    border
+                    border-gray-200/80
+                    bg-white/90
+                    text-gray-500
+                    shadow-[0_4px_18px_rgba(0,0,0,0.07)]
+                    backdrop-blur-xl
+                    dark:border-white/10
+                    dark:bg-white/[0.06]
+                    dark:text-gray-300
+                    sm:h-10
+                    sm:w-10
+                  "
+                >
+                  <div
+                    className="
+                      absolute
+                      inset-0
+                      rounded-xl
+                      bg-gray-200/40
+                      blur-md
+                      animate-pulse
+                      dark:bg-white/[0.05]
+                    "
+                  />
+
+                  <Sparkles
+                    size={18}
+                    strokeWidth={1.7}
+                    className="
+                      relative
+                      z-10
+                      animate-[spin_2.5s_linear_infinite]
+                    "
+                  />
+                </div>
+
+                {/* THINKING BUBBLE */}
 
                 <div
                   className="
                     flex
-                    h-20
-                    w-20
+                    min-h-[54px]
                     items-center
-                    justify-center
-                    rounded-[26px]
-
+                    gap-3
+                    rounded-2xl
+                    rounded-tl-md
                     border
-                    border-white
-
-                    bg-white/80
-
-                    text-gray-600
-
-                    shadow-[0_15px_45px_rgba(0,0,0,0.1),inset_0_1px_4px_white]
-
+                    border-gray-200/80
+                    bg-white/90
+                    px-4
+                    py-3
+                    shadow-[0_6px_20px_rgba(0,0,0,0.04)]
                     backdrop-blur-xl
-
-                    transition-colors
-                    duration-300
-
                     dark:border-white/10
-                    dark:bg-white/5
-                    dark:text-gray-300
-
-                    sm:h-24
-                    sm:w-24
-                    sm:rounded-[30px]
+                    dark:bg-[#171b1e]/90
+                    dark:shadow-[0_8px_25px_rgba(0,0,0,0.2)]
+                    sm:px-5
                   "
                 >
-
-                  <Globe2
-                    size={34}
-                    strokeWidth={1.3}
-                    className="sm:h-10 sm:w-10"
-                  />
-
-                </div>
-
-                <div
-                  className="
-                    absolute
-                    -inset-4
-                    -z-10
-                    rounded-[40px]
-                    bg-white/60
-                    blur-2xl
-
-                    dark:bg-white/[0.03]
-                  "
-                />
-
-              </div>
-
-              {/* HEADING */}
-
-              <h1
-                className="
-                  max-w-3xl
-
-                  text-2xl
-                  font-bold
-                  leading-tight
-                  tracking-tight
-
-                  text-gray-900
-
-                  transition-colors
-                  duration-300
-
-                  dark:text-white
-
-                  sm:text-3xl
-                  md:text-4xl
-                "
-              >
-
-                Hey, I'm{" "}
-
-                <span className="text-emerald-500">
-                  Nova
-                </span>
-
-                . How can I help you today?
-
-              </h1>
-
-              {/* DESCRIPTION */}
-
-              <p
-                className="
-                  mt-4
-                  max-w-xl
-
-                  text-sm
-                  leading-6
-
-                  text-gray-400
-
-                  transition-colors
-                  duration-300
-
-                  dark:text-gray-500
-
-                  sm:text-base
-                "
-              >
-                Ask me anything. I can help with coding,
-                ideas, explanations, writing and much more.
-              </p>
-
-              {/* ================= QUICK ACTIONS ================= */}
-
-              <div
-                className="
-                  mt-7
-                  flex
-                  max-w-xl
-                  flex-wrap
-                  justify-center
-                  gap-2
-
-                  sm:mt-8
-                "
-              >
-
-                {quickActions.map((item) => (
-
-                  <button
-                    key={item}
-                    onClick={() =>
-                      handleSendMessage(item)
-                    }
-                    disabled={isLoading}
+                  <span
                     className="
-                      rounded-xl
-
-                      border
-                      border-gray-200
-
-                      bg-white/75
-
-                      px-3
-                      py-2.5
-
-                      text-xs
+                      text-[13px]
                       font-medium
-
-                      text-black
-
-                      shadow-[0_4px_15px_rgba(0,0,0,0.04)]
-
-                      backdrop-blur-xl
-
-                      transition-all
-                      duration-200
-
-                      hover:-translate-y-0.5
-                      hover:bg-white
-                      hover:text-gray-900
-                      hover:shadow-md
-
-                      disabled:cursor-not-allowed
-                      disabled:opacity-50
-
-                      dark:border-white/10
-                      dark:bg-white/5
-                      dark:text-gray-200
-                      dark:hover:bg-white/10
-                      dark:hover:text-white
-
-                      sm:px-4
+                      text-gray-500
+                      dark:text-gray-400
+                      sm:text-sm
                     "
                   >
-                    {item}
-                  </button>
+                    Nova AI is thinking
+                  </span>
 
-                ))}
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="
+                        h-1.5
+                        w-1.5
+                        rounded-full
+                        bg-gray-400
+                        animate-[bounce_1.2s_infinite]
+                        dark:bg-gray-500
+                      "
+                    />
 
-              </div>
+                    <span
+                      className="
+                        h-1.5
+                        w-1.5
+                        rounded-full
+                        bg-gray-400
+                        animate-[bounce_1.2s_0.15s_infinite]
+                        dark:bg-gray-500
+                      "
+                    />
 
-            </div>
-
-          )}
-
-          {/* ================================================= */}
-          {/* MESSAGES */}
-          {/* ================================================= */}
-
-          {messages.length > 0 && (
-
-            <div className="space-y-6">
-
-              {messages.map((message) => (
-
-                <Message
-                  key={message.id}
-                  message={message}
-                />
-
-              ))}
-
-              {/* ================= LOADING ================= */}
-
-              {isLoading && (
-
-                <div className="flex items-center gap-3">
-
-                  <div
-                    className="
-                      flex
-                      h-10
-                      w-10
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-xl
-
-                      border
-                      border-gray-200
-
-                      bg-white
-
-                      text-black
-
-                      shadow-sm
-
-                      transition-colors
-                      duration-300
-
-                      dark:border-white/10
-                      dark:bg-white/5
-                      dark:text-white
-                    "
-                  >
-
-                    <Sparkles size={17} />
-
+                    <span
+                      className="
+                        h-1.5
+                        w-1.5
+                        rounded-full
+                        bg-gray-400
+                        animate-[bounce_1.2s_0.3s_infinite]
+                        dark:bg-gray-500
+                      "
+                    />
                   </div>
-
-                  <div
-                    className="
-                      rounded-2xl
-
-                      border
-                      border-gray-200
-
-                      bg-white/80
-
-                      px-5
-                      py-4
-
-                      shadow-sm
-
-                      backdrop-blur-xl
-
-                      transition-colors
-                      duration-300
-
-                      dark:border-white/10
-                      dark:bg-white/5
-                    "
-                  >
-
-                    <div className="flex gap-1.5">
-
-                      <span
-                        className="
-                          h-2
-                          w-2
-                          animate-bounce
-                          rounded-full
-                          bg-blue-400
-                        "
-                      />
-
-                      <span
-                        className="
-                          h-2
-                          w-2
-                          animate-bounce
-                          rounded-full
-                          bg-emerald-400
-                        "
-                        style={{
-                          animationDelay: "120ms",
-                        }}
-                      />
-
-                      <span
-                        className="
-                          h-2
-                          w-2
-                          animate-bounce
-                          rounded-full
-                          bg-black
-
-                          dark:bg-white
-                        "
-                        style={{
-                          animationDelay: "240ms",
-                        }}
-                      />
-
-                    </div>
-
-                  </div>
-
                 </div>
+              </div>
+            )}
 
-              )}
-
-              <div ref={messagesEndRef} />
-
-            </div>
-
-          )}
-
-        </div>
-
+            <div ref={messagesEndRef} />
+          </div>
+        )}
       </div>
 
-      {/* ================================================= */}
-      {/* INPUT */}
-      {/* ================================================= */}
+      {/* ================= INPUT ================= */}
 
       <div
         className="
           shrink-0
-
-          border-t
-          border-gray-200/60
-
-          bg-white/55
-
           px-3
           pb-3
-          pt-3
-
-          backdrop-blur-2xl
-
-          transition-colors
-          duration-300
-
-          dark:border-white/10
-          dark:bg-[#111416]/85
-
           sm:px-5
-          sm:pb-4
-          sm:pt-4
-
-          md:px-10
+          sm:pb-5
+          md:px-8
         "
       >
-
-        <div className="mx-auto w-full max-w-6xl">
-
+        <div className="mx-auto w-full max-w-5xl">
           <ChatInput
-            onSendMessage={handleSendMessage}
-            disabled={isLoading}
+            onSendMessage={sendMessage}
+            disabled={loading}
           />
-
-          <p
-            className="
-              mt-2
-              text-center
-
-              text-[10px]
-              font-medium
-
-              text-gray-500
-
-              transition-colors
-              duration-300
-
-              dark:text-gray-600
-            "
-          >
-            AI can make mistakes. Check important information.
-          </p>
-
         </div>
-
       </div>
-
     </div>
   );
 }

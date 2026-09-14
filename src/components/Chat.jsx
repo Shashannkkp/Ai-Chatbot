@@ -428,13 +428,22 @@ function Chat({
 
             {/* TITLE */}
 
-            <h1>
-              Hey, I'm{" "}
-              <span className="text-emerald-500">
-                Nova
-              </span>
-              . How can I help you today?
-            </h1>
+            <h1
+  className="
+    text-2xl
+    font-semibold
+    tracking-tight
+    text-gray-900
+    dark:text-white
+    sm:text-3xl
+  "
+>
+  Hey, I'm{" "}
+  <span className="text-emerald-500">
+    Nova
+  </span>
+  . How can I help you today?
+</h1>
 
             <p
               className="

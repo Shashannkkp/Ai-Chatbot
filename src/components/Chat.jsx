@@ -11,7 +11,7 @@ import {
 import ChatInput from "./ChatInput";
 import Message from "./Message";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/chat`;
+const API_URL = "/api/chat";
 
 function Chat({
   chat,

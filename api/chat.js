@@ -1,21 +1,21 @@
-const { GoogleGenAI } = require("@google/genai");
+import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-module.exports = async (req, res) => {
-  // Allow requests from your frontend
+export default async function handler(req, res) {
+  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle browser preflight request
+  // Browser preflight
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // Only allow POST
+  // Only POST
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Method not allowed",
@@ -45,8 +45,6 @@ module.exports = async (req, res) => {
         .join("") ||
       "I couldn't generate a response right now.";
 
-    console.log("AI response received");
-
     return res.status(200).json({
       reply,
     });
@@ -55,7 +53,7 @@ module.exports = async (req, res) => {
 
     return res.status(500).json({
       error: "Something went wrong while talking to Gemini.",
-      details: error.message,
+      details: error?.message || "Unknown error",
     });
   }
-};
+}

@@ -8,7 +8,6 @@ function App() {
   const [chats, setChats] = useState(() => {
     try {
       const savedChats = localStorage.getItem("nova-ai-chats");
-
       return savedChats ? JSON.parse(savedChats) : [];
     } catch (error) {
       console.error("Failed to load saved chats:", error);
@@ -18,28 +17,22 @@ function App() {
 
   const [activeChatId, setActiveChatId] = useState(null);
 
-
   // ================= DARK MODE =================
 
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("nova-ai-dark-mode") === "true";
   });
 
-
   // ================= APPLY DARK MODE =================
 
   useEffect(() => {
-    localStorage.setItem(
-      "nova-ai-dark-mode",
-      darkMode
-    );
+    localStorage.setItem("nova-ai-dark-mode", darkMode);
 
     document.documentElement.classList.toggle(
       "dark",
       darkMode
     );
   }, [darkMode]);
-
 
   // ================= SAVE CHATS =================
 
@@ -54,20 +47,17 @@ function App() {
     }
   }, [chats]);
 
-
   // ================= NEW CHAT =================
 
   const handleNewChat = () => {
     setActiveChatId(null);
   };
 
-
   // ================= SELECT CHAT =================
 
   const handleSelectChat = (chatId) => {
     setActiveChatId(chatId);
   };
-
 
   // ================= UPDATE CHAT =================
 
@@ -77,7 +67,6 @@ function App() {
         (chat) => chat.id === updatedChat.id
       );
 
-      // Update existing chat
       if (existingChat) {
         return prevChats.map((chat) =>
           chat.id === updatedChat.id
@@ -86,7 +75,6 @@ function App() {
         );
       }
 
-      // Add new chat to the top
       return [
         updatedChat,
         ...prevChats,
@@ -96,20 +84,18 @@ function App() {
     setActiveChatId(updatedChat.id);
   };
 
-
   // ================= ACTIVE CHAT =================
 
   const activeChat = chats.find(
     (chat) => chat.id === activeChatId
   );
 
-
   // ================= UI =================
 
   return (
     <div
       className="
-        min-h-screen
+        min-h-[100dvh]
         w-full
 
         bg-[#eef0f2]
@@ -157,7 +143,6 @@ function App() {
           "
         />
 
-
         {/* BOTTOM RIGHT GLOW */}
 
         <div
@@ -187,7 +172,6 @@ function App() {
 
       </div>
 
-
       {/* ================= MAIN GLASS CONTAINER ================= */}
 
       <div
@@ -195,8 +179,12 @@ function App() {
           relative
 
           flex
+          flex-col
+          sm:flex-row
 
-          h-screen
+          min-h-[100dvh]
+          sm:h-[calc(100dvh-24px)]
+
           w-full
 
           overflow-hidden
@@ -216,8 +204,6 @@ function App() {
 
           dark:bg-[#111416]/90
           dark:border-white/10
-
-          sm:h-[calc(100vh-24px)]
 
           sm:rounded-[24px]
 
@@ -239,12 +225,12 @@ function App() {
           onSelectChat={handleSelectChat}
         />
 
-
         {/* ================= CHAT ================= */}
 
         <main
           className="
             min-w-0
+            min-h-0
             flex-1
             overflow-hidden
           "
@@ -253,7 +239,6 @@ function App() {
           <Chat
             chat={activeChat}
             onUpdateChat={handleUpdateChat}
-
             darkMode={darkMode}
             setDarkMode={setDarkMode}
           />

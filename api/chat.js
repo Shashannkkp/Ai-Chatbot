@@ -1,4 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
+import { connectToDatabase } from "../lib/mongodb.js";
+import Chat from "../models/Chat.js";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -33,6 +35,20 @@ export default async function handler(req, res) {
 
     console.log("User:", message);
 
+    // Connect to MongoDB
+    await connectToDatabase();
+
+    // Create a new chat with the user's message
+    const chat = await Chat.create({
+      messages: [
+        {
+          role: "user",
+          content: message.trim(),
+        },
+      ],
+    });
+
+    // Send message to Gemini
     const response = await ai.models.generateContent({
       model: "gemini-3.6-flash",
       contents: message.trim(),
@@ -45,15 +61,24 @@ export default async function handler(req, res) {
         .join("") ||
       "I couldn't generate a response right now.";
 
+    // Save Gemini's response
+    chat.messages.push({
+      role: "assistant",
+      content: reply,
+    });
+
+    await chat.save();
+
     return res.status(200).json({
       reply,
     });
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    console.error("Chat API Error:", error);
 
     return res.status(500).json({
-      error: "Something went wrong while talking to Gemini.",
+      error: "Something went wrong while processing your request.",
       details: error?.message || "Unknown error",
     });
   }
 }
+

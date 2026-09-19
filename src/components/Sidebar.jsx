@@ -1257,7 +1257,7 @@ function Sidebar({
 
         {/* UPGRADE CARD */}
 
-        <div
+{/*        <div
           className="
             mb-2
             mt-3
@@ -1285,7 +1285,7 @@ function Sidebar({
             dark:shadow-[0_10px_30px_rgba(0,0,0,0.25)]
           "
         >
-          <div className="mb-2 flex items-center gap-2">
+        <div className="mb-2 flex items-center gap-2">
             <div
               className="
                 flex
@@ -1365,7 +1365,7 @@ function Sidebar({
           >
             Upgrade
           </button>
-        </div>
+         </div>     */}
 
         {/* USER PROFILE */}
 

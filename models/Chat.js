@@ -6,6 +6,7 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     content: {
       type: String,
       required: true,
@@ -18,6 +19,12 @@ const messageSchema = new mongoose.Schema(
 
 const chatSchema = new mongoose.Schema(
   {
+    title: {
+      type: String,
+      default: "New Conversation",
+      trim: true,
+    },
+
     messages: {
       type: [messageSchema],
       default: [],

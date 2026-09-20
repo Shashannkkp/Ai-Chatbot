@@ -7,7 +7,6 @@ import {
   FileText,
   ChevronRight,
   MoreVertical,
-  Sparkles,
   Globe2,
   MessageSquare,
   User,
@@ -165,7 +164,7 @@ function Sidebar({
     }
   };
 
-  // ================= MENU ACTIONS =================
+  // ================= PROFILE MENU ACTIONS =================
 
   const handleProfile = () => {
     setProfileOpen(false);
@@ -177,10 +176,7 @@ function Sidebar({
     console.log("Settings clicked");
   };
 
-  const handleUpgrade = () => {
-    setProfileOpen(false);
-    console.log("Upgrade clicked");
-  };
+  // ================= LOGOUT =================
 
   const handleLogout = () => {
     setProfileOpen(false);
@@ -331,7 +327,9 @@ function Sidebar({
           }
         `}
       >
+        {/* ========================================================= */}
         {/* MOBILE CLOSE BUTTON */}
+        {/* ========================================================= */}
 
         <div className="mb-4 flex items-center justify-end sm:hidden">
           <button
@@ -368,7 +366,9 @@ function Sidebar({
           </button>
         </div>
 
+        {/* ========================================================= */}
         {/* LOGO */}
+        {/* ========================================================= */}
 
         <div className="mb-8 flex items-center gap-3 px-2">
           <div
@@ -446,7 +446,9 @@ function Sidebar({
           </div>
         </div>
 
+        {/* ========================================================= */}
         {/* NEW CHAT */}
+        {/* ========================================================= */}
 
         <button
           type="button"
@@ -517,7 +519,9 @@ function Sidebar({
           New Chat
         </button>
 
+        {/* ========================================================= */}
         {/* MENU */}
+        {/* ========================================================= */}
 
         <p
           className="
@@ -558,7 +562,9 @@ function Sidebar({
           />
         </div>
 
+        {/* ========================================================= */}
         {/* DIVIDER */}
+        {/* ========================================================= */}
 
         <div
           className="
@@ -574,7 +580,9 @@ function Sidebar({
           "
         />
 
+        {/* ========================================================= */}
         {/* RECENT CHATS */}
+        {/* ========================================================= */}
 
         <div className="mb-3 flex items-center justify-between px-2">
           <p
@@ -620,7 +628,9 @@ function Sidebar({
           )}
         </div>
 
+        {/* ========================================================= */}
         {/* SEARCH CHATS */}
+        {/* ========================================================= */}
 
         {chats.length > 0 && (
           <div className="mb-3 px-1">
@@ -724,7 +734,9 @@ function Sidebar({
           </div>
         )}
 
+        {/* ========================================================= */}
         {/* CHAT LIST */}
+        {/* ========================================================= */}
 
         <div
           className="
@@ -853,12 +865,14 @@ function Sidebar({
                 key={chat.id}
                 className="group relative"
               >
+                {/* ================================================= */}
                 {/* CHAT BUTTON */}
+                {/* ================================================= */}
 
                 <button
                   type="button"
                   onClick={() => handleSelectChatClick(chat.id)}
-                  className={` 
+                  className={`
                     group/chat
                     flex
                     w-full
@@ -935,9 +949,14 @@ function Sidebar({
                         onChange={(event) =>
                           setEditingTitle(event.target.value)
                         }
-                        onClick={(event) => event.stopPropagation()}
+                        onClick={(event) =>
+                          event.stopPropagation()
+                        }
                         onKeyDown={(event) =>
-                          handleRenameKeyDown(event, chat.id)
+                          handleRenameKeyDown(
+                            event,
+                            chat.id
+                          )
                         }
                         className="
                           w-full
@@ -1022,7 +1041,9 @@ function Sidebar({
                                   }
                                 `}
                               >
-                                {formatChatTime(chat.updatedAt)}
+                                {formatChatTime(
+                                  chat.updatedAt
+                                )}
                               </p>
                             </>
                           )}
@@ -1050,7 +1071,9 @@ function Sidebar({
                   )}
                 </button>
 
-                {/* RENAME BUTTON */}
+                {/* ================================================= */}
+                {/* RENAME / SAVE BUTTON */}
+                {/* ================================================= */}
 
                 {editingChatId === chat.id ? (
                   <div
@@ -1068,7 +1091,10 @@ function Sidebar({
                     <button
                       type="button"
                       onClick={(event) =>
-                        handleRenameSave(event, chat.id)
+                        handleRenameSave(
+                          event,
+                          chat.id
+                        )
                       }
                       aria-label="Save chat name"
                       title="Save"
@@ -1127,7 +1153,10 @@ function Sidebar({
                   <button
                     type="button"
                     onClick={(event) =>
-                      handleRenameStart(event, chat)
+                      handleRenameStart(
+                        event,
+                        chat
+                      )
                     }
                     aria-label={`Rename ${
                       chat.title || "conversation"
@@ -1187,12 +1216,17 @@ function Sidebar({
                   </button>
                 )}
 
+                {/* ================================================= */}
                 {/* DELETE BUTTON */}
+                {/* ================================================= */}
 
                 <button
                   type="button"
                   onClick={(event) =>
-                    handleDeleteChatClick(event, chat.id)
+                    handleDeleteChatClick(
+                      event,
+                      chat.id
+                    )
                   }
                   aria-label={`Delete ${
                     chat.title || "conversation"
@@ -1255,119 +1289,9 @@ function Sidebar({
           )}
         </div>
 
-        {/* UPGRADE CARD */}
-
-{/*        <div
-          className="
-            mb-2
-            mt-3
-
-            overflow-hidden
-
-            rounded-2xl
-
-            border
-            border-white
-
-            bg-white/70
-
-            p-4
-
-            shadow-[0_10px_30px_rgba(0,0,0,0.06)]
-
-            backdrop-blur-xl
-
-            transition-colors
-            duration-300
-
-            dark:border-white/10
-            dark:bg-white/5
-            dark:shadow-[0_10px_30px_rgba(0,0,0,0.25)]
-          "
-        >
-        <div className="mb-2 flex items-center gap-2">
-            <div
-              className="
-                flex
-                h-8
-                w-8
-                items-center
-                justify-center
-
-                rounded-lg
-
-                bg-gray-100
-
-                dark:bg-white/10
-              "
-            >
-              <Sparkles
-                size={16}
-                className="text-gray-500 dark:text-gray-400"
-              />
-            </div>
-
-            <span
-              className="
-                text-sm
-                font-semibold
-
-                text-gray-800
-
-                dark:text-gray-200
-              "
-            >
-              Upgrade your AI
-            </span>
-          </div>
-
-          <p
-            className="
-              mb-3
-              text-xs
-              leading-5
-
-              text-gray-400
-
-              dark:text-gray-500
-            "
-          >
-            Unlock more powerful AI features.
-          </p>
-
-          <button
-            type="button"
-            onClick={handleUpgrade}
-            className="
-              w-full
-              rounded-xl
-
-              bg-gray-900
-
-              py-2.5
-
-              text-xs
-              font-semibold
-              text-white
-
-              shadow-lg
-
-              transition-all
-              duration-200
-
-              hover:-translate-y-0.5
-              hover:bg-gray-800
-
-              dark:bg-white
-              dark:text-gray-900
-              dark:hover:bg-gray-200
-            "
-          >
-            Upgrade
-          </button>
-         </div>     */}
-
+        {/* ========================================================= */}
         {/* USER PROFILE */}
+        {/* ========================================================= */}
 
         <div
           ref={profileRef}
@@ -1375,7 +1299,9 @@ function Sidebar({
         >
           <button
             type="button"
-            onClick={() => setProfileOpen((prev) => !prev)}
+            onClick={() =>
+              setProfileOpen((prev) => !prev)
+            }
             aria-expanded={profileOpen}
             className="
               flex
@@ -1509,7 +1435,9 @@ function Sidebar({
             />
           </button>
 
+          {/* ======================================================= */}
           {/* PROFILE POPUP */}
+          {/* ======================================================= */}
 
           {profileOpen && (
             <div
@@ -1542,6 +1470,8 @@ function Sidebar({
                 dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)]
               "
             >
+              {/* PROFILE HEADER */}
+
               <div
                 className="
                   mb-2
@@ -1613,6 +1543,8 @@ function Sidebar({
                 </div>
               </div>
 
+              {/* PROFILE */}
+
               <button
                 type="button"
                 onClick={handleProfile}
@@ -1644,6 +1576,8 @@ function Sidebar({
                 <User size={17} />
                 Profile
               </button>
+
+              {/* SETTINGS */}
 
               <button
                 type="button"
@@ -1677,37 +1611,7 @@ function Sidebar({
                 Settings
               </button>
 
-              <button
-                type="button"
-                onClick={handleUpgrade}
-                className="
-                  flex
-                  w-full
-                  items-center
-                  gap-3
-
-                  rounded-xl
-
-                  px-3
-                  py-2.5
-
-                  text-sm
-                  font-medium
-
-                  text-gray-700
-
-                  transition-colors
-
-                  hover:bg-gray-100
-
-                  dark:text-gray-300
-                  dark:hover:bg-white/10
-                  dark:hover:text-white
-                "
-              >
-                <Sparkles size={17} />
-                Upgrade Plan
-              </button>
+              {/* DIVIDER */}
 
               <div
                 className="
@@ -1719,6 +1623,8 @@ function Sidebar({
                   dark:bg-white/10
                 "
               />
+
+              {/* LOGOUT */}
 
               <button
                 type="button"

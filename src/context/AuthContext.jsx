@@ -1,4 +1,3 @@
-import { set } from "mongoose";
 import { createContext, use, useContext, useState } from "react";
 
 const AuthContext = createContext(null);
@@ -6,7 +5,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }){
     const [ user, setUser ] = useState(null);
 
-    const login = login = (userData) => {
+    const login = (userData) => {
         setUser(userData);
     };
 

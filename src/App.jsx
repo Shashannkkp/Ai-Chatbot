@@ -3,6 +3,7 @@ import { Menu } from "lucide-react";
 
 import Sidebar from "./components/Sidebar";
 import Chat from "./components/Chat";
+import Navbar from "./components/Navbar";
 
 function App() {
   // =========================================================
@@ -229,6 +230,9 @@ function App() {
         md:p-4
       "
     >
+      <Navbar />
+
+      
       {/* ===================================================== */}
       {/* BACKGROUND EFFECTS */}
       {/* ===================================================== */}

@@ -1,18 +1,22 @@
 import { connectToDatabase } from "../lib/mongodb.js";
 import Chat from "../models/Chat.js";
+import { authenticateRequest } from "../lib/auth.js";
 
 export default async function handler(req, res) {
-  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
 
-  // Handle browser preflight request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  // Only allow GET
   if (req.method !== "GET") {
     return res.status(405).json({
       error: "Method not allowed",
@@ -20,15 +24,22 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Connect to MongoDB
+    const decoded = authenticateRequest(req);
+
+    if (!decoded) {
+      return res.status(401).json({
+        error: "Unauthorized",
+      });
+    }
+
     await connectToDatabase();
 
-    // Get all chats, newest first
-    const chats = await Chat.find({})
+    const chats = await Chat.find({
+      userId: decoded.userId,
+    })
       .sort({ updatedAt: -1 })
       .lean();
 
-    // Convert MongoDB documents into frontend-friendly objects
     const formattedChats = chats.map((chat) => {
       const firstUserMessage = chat.messages?.find(
         (message) => message.role === "user"

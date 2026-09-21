@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+
 import {
   Globe2,
   MoreVertical,
@@ -11,10 +13,13 @@ import {
   PenLine,
 } from "lucide-react";
 
+
+
 import ChatInput from "./ChatInput";
 import Message from "./Message";
 
 const API_URL = "/api/chat";
+
 
 function Chat({
   chat,
@@ -22,6 +27,7 @@ function Chat({
   darkMode,
   setDarkMode,
 }) {
+  const { token } = useAuth();
   const [messages, setMessages] = useState(chat?.messages || []);
   const [loading, setLoading] = useState(false);
 
@@ -152,6 +158,7 @@ function Chat({
         },
         body: JSON.stringify({
           message: cleanText,
+          chatId: chat?.id || null,
         }),
       });
 
@@ -176,6 +183,8 @@ function Chat({
         timestamp: new Date().toISOString(),
       };
 
+      const serverChatId = data?.chat?.id;
+
       const finalMessages = [
         ...updatedMessages,
         aiMessage,
@@ -187,8 +196,10 @@ function Chat({
 
       if (!chat) {
         onUpdateChat({
-          id: currentChatId,
-          title: generateChatTitle(cleanText),
+          id: serverChatId || currentChatId,
+          title:
+            data?.chat?.title ||
+          generateChatTitle(cleanText),
           messages: finalMessages,
         });
 

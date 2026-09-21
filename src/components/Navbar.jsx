@@ -37,11 +37,24 @@ export default function Navbar() {
         }),
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Authentication failed");
-      }
+      let data = {};
+
+      try {
+         data = responseText ? JSON.parse(responseText) : {};
+      } catch (parseError) {
+        console.error("Invalid JSON response:", responseText);
+        throw new Error(
+    `      Server returned an invalid response (${response.status})`
+      );
+}
+
+     if (!response.ok) {
+        throw new Error(
+            data?.error || `Authentication failed (${response.status})`
+          );
+        }
 
       login(data.user, data.token);
 

@@ -258,7 +258,7 @@ function Sidebar({
             fixed
             inset-0
             z-40
-            bg-black/40
+            bg-black/50
             backdrop-blur-sm
 
             sm:hidden

@@ -891,7 +891,7 @@ function Chat({
                         h-1.5
                         w-1.5
                         rounded-full
-                        bg-gray-400
+                        bg-gray-500
                         animate-[bounce_1.2s_0.3s_infinite]
                         dark:bg-gray-500
                       "

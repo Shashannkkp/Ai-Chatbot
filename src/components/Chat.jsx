@@ -12,13 +12,11 @@ import {
   PenLine,
 } from "lucide-react";
 
-
-
 import ChatInput from "./ChatInput";
 import Message from "./Message";
+import { useAuth } from "../context/AuthContext";
 
 const API_URL = "/api/chat";
-
 
 function Chat({
   chat,
@@ -27,7 +25,11 @@ function Chat({
   setDarkMode,
 }) {
   const { token } = useAuth();
-  const [messages, setMessages] = useState(chat?.messages || []);
+
+  const [messages, setMessages] = useState(
+    chat?.messages || []
+  );
+
   const [loading, setLoading] = useState(false);
 
   const messagesEndRef = useRef(null);
@@ -110,6 +112,39 @@ function Chat({
 
     const cleanText = text.trim();
 
+    // ================================
+    // CHECK LOGIN
+    // ================================
+
+    if (!token) {
+      const loginMessage = {
+        id: Date.now(),
+        sender: "ai",
+        text: "Please log in to use Nova AI.",
+        timestamp: new Date().toISOString(),
+      };
+
+      const finalMessages = [
+        ...messages,
+        loginMessage,
+      ];
+
+      setMessages(finalMessages);
+
+      if (chat) {
+        onUpdateChat({
+          ...chat,
+          messages: finalMessages,
+        });
+      }
+
+      return;
+    }
+
+    // ================================
+    // USER MESSAGE
+    // ================================
+
     const userMessage = {
       id: Date.now(),
       sender: "user",
@@ -122,9 +157,9 @@ function Chat({
       userMessage,
     ];
 
-    // ==========================================
+    // ================================
     // CREATE NEW CHAT
-    // ==========================================
+    // ================================
 
     let currentChatId = chat?.id;
 
@@ -146,9 +181,9 @@ function Chat({
     setLoading(true);
 
     try {
-      // ==========================================
+      // ================================
       // CALL BACKEND
-      // ==========================================
+      // ================================
 
       const response = await fetch(API_URL, {
         method: "POST",
@@ -170,9 +205,9 @@ function Chat({
         );
       }
 
-      // ==========================================
+      // ================================
       // AI MESSAGE
-      // ==========================================
+      // ================================
 
       const aiMessage = {
         id: Date.now() + 1,
@@ -190,16 +225,16 @@ function Chat({
         aiMessage,
       ];
 
-      // ==========================================
+      // ================================
       // SAVE AI RESPONSE
-      // ==========================================
+      // ================================
 
       if (!chat) {
         onUpdateChat({
           id: serverChatId || currentChatId,
           title:
             data?.chat?.title ||
-          generateChatTitle(cleanText),
+            generateChatTitle(cleanText),
           messages: finalMessages,
         });
 
@@ -210,15 +245,17 @@ function Chat({
     } catch (error) {
       console.error("Chat error:", error);
 
-      // ==========================================
+      // ================================
       // ERROR MESSAGE
-      // ==========================================
+      // ================================
 
       const errorMessage = {
         id: Date.now() + 1,
         sender: "ai",
         text:
-          "Sorry, something went wrong. Please try again.",
+          error?.message === "Unauthorized"
+            ? "Your session has expired. Please log in again."
+            : "Sorry, something went wrong. Please try again.",
         timestamp: new Date().toISOString(),
       };
 
@@ -440,21 +477,21 @@ function Chat({
             {/* TITLE */}
 
             <h1
-  className="
-    text-2xl
-    font-semibold
-    tracking-tight
-    text-gray-900
-    dark:text-white
-    sm:text-3xl
-  "
->
-  Hey, I'm{" "}
-  <span className="text-emerald-500">
-    Nova
-  </span>
-  . How can I help you today?
-</h1>
+              className="
+                text-2xl
+                font-semibold
+                tracking-tight
+                text-gray-900
+                dark:text-white
+                sm:text-3xl
+              "
+            >
+              Hey, I'm{" "}
+              <span className="text-emerald-500">
+                Nova
+              </span>
+              . How can I help you today?
+            </h1>
 
             <p
               className="

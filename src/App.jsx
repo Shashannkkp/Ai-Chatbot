@@ -74,6 +74,9 @@ function App() {
     }
 
     let cancelled = false;
+    localStorage.removeItem("nova-ai-chats");
+    setChats([]);
+    setActiveChatId(null);
 
     const loadAccountChats = async () => {
       try {
@@ -107,18 +110,8 @@ function App() {
         );
 
         if (!cancelled) {
-          setChats((localChats) => {
-            const accountChatIds = new Set(
-              accountChats.map((chat) => String(chat.id))
-            );
-
-            const localOnlyChats = localChats.filter(
-              (chat) =>
-                !accountChatIds.has(String(chat.id))
-            );
-
-            return [...accountChats, ...localOnlyChats];
-          });
+          setChats(accountChats);
+          setActiveChatId(accountChats[0]?.id || null);
         }
       } catch (error) {
         console.error("Failed to load account chats:", error);
@@ -150,6 +143,11 @@ function App() {
   // =========================================================
 
   useEffect(() => {
+    if (token) {
+      localStorage.removeItem("nova-ai-chats");
+      return;
+    }
+
     try {
       localStorage.setItem(
         "nova-ai-chats",
@@ -158,7 +156,7 @@ function App() {
     } catch (error) {
       console.error("Failed to save chats:", error);
     }
-  }, [chats]);
+  }, [chats, token]);
 
   // =========================================================
   // VALIDATE ACTIVE CHAT

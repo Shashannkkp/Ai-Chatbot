@@ -191,10 +191,6 @@ function App() {
     setSidebarOpen(false);
   };
 
-  // =========================================================
-  // UPDATE / CREATE CHAT
-  // =========================================================
-
   const handleUpdateChat = (updatedChat) => {
     const chatWithTimestamp = {
       ...updatedChat,
@@ -228,14 +224,30 @@ function App() {
   // DELETE CHAT
   // =========================================================
 
-  const handleDeleteChat = (chatId) => {
-    console.log("Deleting chat:", chatId);
+  const handleDeleteChat = async (chatId) => {
+    try {
+      if (token && typeof chatId === "string") {
+        const response = await fetch(
+          `/api/chats?id=${encodeURIComponent(chatId)}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-    setChats((prevChats) => {
-      return prevChats.filter(
-        (chat) => chat.id !== chatId
+        if (!response.ok) {
+          throw new Error("Failed to delete chat");
+        }
+      }
+
+      setChats((prevChats) =>
+        prevChats.filter((chat) => chat.id !== chatId)
       );
-    });
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+    }
 
     // The active-chat validation effect
     // will automatically select another chat.

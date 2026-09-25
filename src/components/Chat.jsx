@@ -174,7 +174,10 @@ function Chat({
         },
         body: JSON.stringify({
           message: cleanText,
-          chatId: chat?.id || null,
+          chatId:
+            typeof chat?.id === "string"
+              ? chat.id
+              : null,
         }),
       });
 
@@ -219,6 +222,18 @@ function Chat({
           messages: finalMessages,
         });
 
+        setMessages(finalMessages);
+      } else if (
+        serverChatId &&
+        String(serverChatId) !== String(chat.id)
+      ) {
+        onUpdateChat({
+          ...chat,
+          id: serverChatId,
+          title:
+            data?.chat?.title || chat.title,
+          messages: finalMessages,
+        });
         setMessages(finalMessages);
       } else {
         updateChat(finalMessages);

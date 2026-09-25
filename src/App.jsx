@@ -3,8 +3,11 @@ import { Menu } from "lucide-react";
 
 import Sidebar from "./components/Sidebar";
 import Chat from "./components/Chat";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
+  const { token } = useAuth();
+
   // =========================================================
   // CHATS
   // =========================================================
@@ -60,6 +63,74 @@ function App() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginRequest, setLoginRequest] = useState(0);
+
+  // =========================================================
+  // LOAD ACCOUNT CHATS
+  // =========================================================
+
+  useEffect(() => {
+    if (!token) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    const loadAccountChats = async () => {
+      try {
+        const response = await fetch("/api/chats", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to load account chats");
+        }
+
+        const data = await response.json();
+        const accountChats = (data.chats || []).map(
+          (chat) => ({
+            ...chat,
+            messages: (chat.messages || []).map(
+              (message) => ({
+                id: message.id || `${chat.id}-${message.role}-${message.content}`,
+                sender:
+                  message.role === "assistant"
+                    ? "ai"
+                    : "user",
+                text: message.content,
+                timestamp:
+                  message.timestamp || chat.updatedAt,
+              })
+            ),
+          })
+        );
+
+        if (!cancelled) {
+          setChats((localChats) => {
+            const accountChatIds = new Set(
+              accountChats.map((chat) => String(chat.id))
+            );
+
+            const localOnlyChats = localChats.filter(
+              (chat) =>
+                !accountChatIds.has(String(chat.id))
+            );
+
+            return [...accountChats, ...localOnlyChats];
+          });
+        }
+      } catch (error) {
+        console.error("Failed to load account chats:", error);
+      }
+    };
+
+    loadAccountChats();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   // =========================================================
   // DARK MODE EFFECT

@@ -21,6 +21,7 @@ const API_URL = "/api/chat";
 function Chat({
   chat,
   onUpdateChat,
+  onRequestLogin,
   darkMode,
   setDarkMode,
 }) {
@@ -117,27 +118,7 @@ function Chat({
     // ================================
 
     if (!token) {
-      const loginMessage = {
-        id: Date.now(),
-        sender: "ai",
-        text: "Please log in to use Nova AI.",
-        timestamp: new Date().toISOString(),
-      };
-
-      const finalMessages = [
-        ...messages,
-        loginMessage,
-      ];
-
-      setMessages(finalMessages);
-
-      if (chat) {
-        onUpdateChat({
-          ...chat,
-          messages: finalMessages,
-        });
-      }
-
+      onRequestLogin?.();
       return;
     }
 

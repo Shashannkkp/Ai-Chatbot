@@ -24,6 +24,7 @@ import { useAuth } from "../context/AuthContext";
 
 function Sidebar({
   onNewChat,
+  loginRequest,
   chats = [],
   activeChatId,
   onSelectChat,
@@ -91,6 +92,12 @@ function Sidebar({
       renameInputRef.current.select();
     }
   }, [editingChatId]);
+
+  useEffect(() => {
+    if (loginRequest) {
+      openAuth("login");
+    }
+  }, [loginRequest]);
 
   // ================= CLOSE SIDEBAR =================
 

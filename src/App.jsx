@@ -60,6 +60,7 @@ function App() {
   // =========================================================
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loginRequest, setLoginRequest] = useState(0);
 
   // =========================================================
   // DARK MODE EFFECT
@@ -383,6 +384,7 @@ function App() {
 
         <Sidebar
           onNewChat={handleNewChat}
+          loginRequest={loginRequest}
           chats={chats}
           activeChatId={activeChatId}
           onSelectChat={handleSelectChat}
@@ -409,6 +411,10 @@ function App() {
           <Chat
             chat={activeChat}
             onUpdateChat={handleUpdateChat}
+            onRequestLogin={() => {
+              setLoginRequest((request) => request + 1);
+              setSidebarOpen(true);
+            }}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
           />

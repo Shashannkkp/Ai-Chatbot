@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Menu } from "lucide-react";
 
 import Sidebar from "./components/Sidebar";
@@ -13,6 +13,10 @@ function App() {
   // =========================================================
 
   const [chats, setChats] = useState(() => {
+    if (token) {
+      return [];
+    }
+
     try {
       const savedChats = localStorage.getItem("nova-ai-chats");
 
@@ -28,6 +32,10 @@ function App() {
   // =========================================================
 
   const [activeChatId, setActiveChatId] = useState(() => {
+    if (token) {
+      return null;
+    }
+
     try {
       const savedChats = localStorage.getItem("nova-ai-chats");
 
@@ -63,20 +71,31 @@ function App() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loginRequest, setLoginRequest] = useState(0);
+  const [canPersistChats, setCanPersistChats] = useState(!token);
+  const previousToken = useRef(token);
 
   // =========================================================
   // LOAD ACCOUNT CHATS
   // =========================================================
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!token) {
+      if (previousToken.current) {
+        setChats([]);
+        setActiveChatId(null);
+        setCanPersistChats(false);
+      }
+
+      previousToken.current = null;
       return undefined;
     }
 
+    previousToken.current = token;
     let cancelled = false;
     localStorage.removeItem("nova-ai-chats");
     setChats([]);
     setActiveChatId(null);
+    setCanPersistChats(false);
 
     const loadAccountChats = async () => {
       try {
@@ -143,7 +162,7 @@ function App() {
   // =========================================================
 
   useEffect(() => {
-    if (token) {
+    if (token || !canPersistChats) {
       localStorage.removeItem("nova-ai-chats");
       return;
     }
@@ -156,7 +175,7 @@ function App() {
     } catch (error) {
       console.error("Failed to save chats:", error);
     }
-  }, [chats, token]);
+  }, [chats, token, canPersistChats]);
 
   // =========================================================
   // VALIDATE ACTIVE CHAT
@@ -192,6 +211,8 @@ function App() {
   };
 
   const handleUpdateChat = (updatedChat) => {
+    setCanPersistChats(true);
+
     const chatWithTimestamp = {
       ...updatedChat,
       updatedAt: new Date().toISOString(),

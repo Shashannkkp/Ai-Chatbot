@@ -2,6 +2,22 @@ import { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext(null);
 
+function clearChatHistoryStorage() {
+  const chatHistoryKey = /chat.*(history|messages|conversations)|(history|messages|conversations).*chat/i;
+
+  for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+    const key = localStorage.key(index);
+
+    if (
+      key === "nova-ai-chats" ||
+      key === "chatHistory" ||
+      (key && chatHistoryKey.test(key))
+    ) {
+      localStorage.removeItem(key);
+    }
+  }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("nova-ai-user");
@@ -14,6 +30,7 @@ export function AuthProvider({ children }) {
   });
 
   const login = (userData, jwtToken) => {
+    clearChatHistoryStorage();
     setUser(userData);
     setToken(jwtToken);
 
@@ -25,8 +42,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setToken(null);
 
-    localStorage.removeItem("nova-ai-user");
-    localStorage.removeItem("nova-ai-token");
+    localStorage.clear();
   };
 
   return (

@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   try {
     const decoded = authenticateRequest(req);
 
-    if (!decoded) {
+    if (req.headers?.authorization && !decoded) {
       return res.status(401).json({
         error: "Unauthorized",
       });
@@ -48,6 +48,19 @@ export default async function handler(req, res) {
     if (!message || !message.trim()) {
       return res.status(400).json({
         error: "Message is required",
+      });
+    }
+
+    if (!decoded) {
+      const response = await ai.models.generateContent({
+        model: "gemini-3.6-flash",
+        contents: message.trim(),
+      });
+
+      return res.status(200).json({
+        reply:
+          response.text ||
+          "Sorry, I couldn't generate a response.",
       });
     }
 

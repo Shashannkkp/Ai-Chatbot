@@ -24,7 +24,6 @@ import { useAuth } from "../context/AuthContext";
 
 function Sidebar({
   onNewChat,
-  loginRequest,
   chats = [],
   activeChatId,
   onSelectChat,
@@ -92,12 +91,6 @@ function Sidebar({
       renameInputRef.current.select();
     }
   }, [editingChatId]);
-
-  useEffect(() => {
-    if (loginRequest) {
-      openAuth("login");
-    }
-  }, [loginRequest]);
 
   // ================= CLOSE SIDEBAR =================
 
@@ -1334,6 +1327,27 @@ function Sidebar({
                     : "Create Account"}
               </button>
             </form>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowAuth(false);
+                setAuthError("");
+              }}
+              className="
+                mt-3 w-full rounded-xl
+                border border-gray-200
+                px-4 py-3
+                text-sm font-medium
+                text-gray-700
+                hover:bg-gray-100
+                dark:border-white/10
+                dark:text-gray-300
+                dark:hover:bg-white/10
+              "
+            >
+              Continue as guest
+            </button>
 
             <div
               className="

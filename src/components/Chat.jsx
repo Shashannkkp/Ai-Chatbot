@@ -21,7 +21,6 @@ const API_URL = "/api/chat";
 function Chat({
   chat,
   onUpdateChat,
-  onRequestLogin,
   darkMode,
   setDarkMode,
 }) {
@@ -114,15 +113,6 @@ function Chat({
     const cleanText = text.trim();
 
     // ================================
-    // CHECK LOGIN
-    // ================================
-
-    if (!token) {
-      onRequestLogin?.();
-      return;
-    }
-
-    // ================================
     // USER MESSAGE
     // ================================
 
@@ -166,12 +156,17 @@ function Chat({
       // CALL BACKEND
       // ================================
 
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers,
         body: JSON.stringify({
           message: cleanText,
           chatId:

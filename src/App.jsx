@@ -12,50 +12,13 @@ function App() {
   // CHATS
   // =========================================================
 
-  const [chats, setChats] = useState(() => {
-    if (token) {
-      return [];
-    }
-
-    try {
-      const savedChats = localStorage.getItem("nova-ai-chats");
-
-      return savedChats ? JSON.parse(savedChats) : [];
-    } catch (error) {
-      console.error("Failed to load saved chats:", error);
-      return [];
-    }
-  });
+  const [chats, setChats] = useState([]);
 
   // =========================================================
   // ACTIVE CHAT
   // =========================================================
 
-  const [activeChatId, setActiveChatId] = useState(() => {
-    if (token) {
-      return null;
-    }
-
-    try {
-      const savedChats = localStorage.getItem("nova-ai-chats");
-
-      if (!savedChats) {
-        return null;
-      }
-
-      const parsedChats = JSON.parse(savedChats);
-
-      if (!Array.isArray(parsedChats) || parsedChats.length === 0) {
-        return null;
-      }
-
-      // Restore the most recent saved chat
-      return parsedChats[0].id;
-    } catch (error) {
-      console.error("Failed to restore active chat:", error);
-      return null;
-    }
-  });
+  const [activeChatId, setActiveChatId] = useState(null);
 
   // =========================================================
   // DARK MODE
@@ -70,9 +33,11 @@ function App() {
   // =========================================================
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loginRequest, setLoginRequest] = useState(0);
-  const [canPersistChats, setCanPersistChats] = useState(!token);
   const previousToken = useRef(token);
+
+  useEffect(() => {
+    localStorage.removeItem("nova-ai-chats");
+  }, []);
 
   // =========================================================
   // LOAD ACCOUNT CHATS
@@ -83,7 +48,6 @@ function App() {
       if (previousToken.current) {
         setChats([]);
         setActiveChatId(null);
-        setCanPersistChats(false);
       }
 
       previousToken.current = null;
@@ -95,7 +59,6 @@ function App() {
     localStorage.removeItem("nova-ai-chats");
     setChats([]);
     setActiveChatId(null);
-    setCanPersistChats(false);
 
     const loadAccountChats = async () => {
       try {
@@ -158,26 +121,6 @@ function App() {
   }, [darkMode]);
 
   // =========================================================
-  // SAVE CHATS
-  // =========================================================
-
-  useEffect(() => {
-    if (token || !canPersistChats) {
-      localStorage.removeItem("nova-ai-chats");
-      return;
-    }
-
-    try {
-      localStorage.setItem(
-        "nova-ai-chats",
-        JSON.stringify(chats)
-      );
-    } catch (error) {
-      console.error("Failed to save chats:", error);
-    }
-  }, [chats, token, canPersistChats]);
-
-  // =========================================================
   // VALIDATE ACTIVE CHAT
   // =========================================================
 
@@ -211,8 +154,6 @@ function App() {
   };
 
   const handleUpdateChat = (updatedChat) => {
-    setCanPersistChats(true);
-
     const chatWithTimestamp = {
       ...updatedChat,
       updatedAt: new Date().toISOString(),
@@ -482,7 +423,6 @@ function App() {
 
         <Sidebar
           onNewChat={handleNewChat}
-          loginRequest={loginRequest}
           chats={chats}
           activeChatId={activeChatId}
           onSelectChat={handleSelectChat}
@@ -509,10 +449,6 @@ function App() {
           <Chat
             chat={activeChat}
             onUpdateChat={handleUpdateChat}
-            onRequestLogin={() => {
-              setLoginRequest((request) => request + 1);
-              setSidebarOpen(true);
-            }}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
           />

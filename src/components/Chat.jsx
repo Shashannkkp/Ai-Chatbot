@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Globe2,
-  MoreVertical,
   Sparkles,
   Sun,
   Moon,
@@ -221,20 +219,11 @@ function Chat({ chat, onUpdateChat, darkMode, setDarkMode }) {
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-transparent">
-      <header className="flex h-[72px] shrink-0 items-center justify-between  bg-white/50 px-4 backdrop-blur-xl dark:border-white/10 dark:bg-[#111416]/60 sm:px-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl  bg-white text-gray-500 shadow-sm dark:border-white/10 dark:bg-white/[0.06] dark:text-gray-300">
-            <Globe2 size={20} strokeWidth={1.6} />
-          </div>
+      <header className="flex h-[50px] shrink-0 items-center justify-between  bg-transparent px-4 backdrop-blur-xl dark:border-white/10 dark:bg-[#111416]/60 sm:px-6">
+        <div className="flex items-center  gap-3">
+          
 
-          <div>
-            <h1 className="text-sm font-semibold tracking-tight text-gray-900 dark:text-white sm:text-base">
-              Nova
-            </h1>
-            <p className="text-[11px] text-gray-400 dark:text-gray-500 sm:text-xs">
-              AI Assistant
-            </p>
-          </div>
+         
         </div>
 
         <div className="flex items-center gap-1

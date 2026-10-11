@@ -330,9 +330,9 @@ function Sidebar({
   });
 
   return (
+    
     <>
       {/* ================= MOBILE OVERLAY ================= */}
-
       {sidebarOpen && (
         <div
           onClick={closeSidebar}
@@ -353,7 +353,7 @@ function Sidebar({
           flex h-[100dvh] w-[290px]
           shrink-0 flex-col
           rounded-r-3xl
-          border border-white/80
+    
           bg-white/95
           p-3
           shadow-[0_20px_50px_rgba(0,0,0,0.15)]
@@ -489,27 +489,35 @@ function Sidebar({
             mb-1 px-2 text-base font-bold
             uppercase tracking-[0.18em]
             text-black dark:text-gray-400
+            
           "
         >
           Menu
         </p>
 
-        <div className="space-y-1">
-          <SidebarItem
-            icon={<Compass size={18} />}
-            text="Market Daily"
-          />
+      
+<div className="space-y-1">
+  <div className="rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md">
+    <SidebarItem
+      icon={<Compass size={18} />}
+      text="Market Daily"
+    />
+  </div>
 
-          <SidebarItem
-            icon={<Star size={18} />}
-            text="My Portfolio"
-          />
+  <div className="rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md">
+    <SidebarItem
+      icon={<Star size={18} />}
+      text="My Portfolio"
+    />
+  </div>
 
-          <SidebarItem
-            icon={<FileText size={18} />}
-            text="My Project"
-          />
-        </div>
+  <div className="rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md">
+    <SidebarItem
+      icon={<FileText size={18} />}
+      text="My Project"
+    />
+  </div>
+</div>
 
         {/* ================= DIVIDER ================= */}
 

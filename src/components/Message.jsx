@@ -73,7 +73,7 @@ function Message({ message, onEditMessage }) {
       className={`
         group flex w-full items-start gap-2.5
         animate-[fadeInUp_0.4s_ease-out]
-        sm:gap-3
+        sm:gap-1
         ${isAI ? "justify-start" : "justify-end"}
       `}
     >
@@ -86,7 +86,7 @@ function Message({ message, onEditMessage }) {
             flex h-9 w-9 shrink-0
             items-center justify-center
             rounded-xl
-            border border-gray-200/80
+             
             bg-white/90
             text-gray-500
             shadow-[0_4px_15px_rgba(0,0,0,0.06)]
@@ -94,8 +94,8 @@ function Message({ message, onEditMessage }) {
             transition-all
             duration-300
             group-hover:scale-105
-            dark:border-white/10
-            dark:bg-white/[0.06]
+          
+          
             dark:text-gray-300
             sm:h-10
             sm:w-10
@@ -134,7 +134,7 @@ function Message({ message, onEditMessage }) {
                 w-full
                 resize-none
                 rounded-2xl
-                border
+                
                 border-gray-300
                 bg-white
                 px-4
@@ -228,22 +228,22 @@ function Message({ message, onEditMessage }) {
                   isAI
                     ? `
                       rounded-tl-md
-                      border border-gray-200/80
+                      
                       bg-white/90
                       text-gray-700
                       backdrop-blur-xl
 
                       hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)]
 
-                      dark:border-white/10
-                      dark:bg-[#171b1e]/90
+              
+                      
                       dark:text-gray-300
                     `
                     : `
-                      rounded-tr-md
-                      border border-gray-700
-                      bg-gray-800
-                      text-white
+                      rounded
+                    
+                      bg-blue-300
+                      text-gray-600
                       shadow-[0_8px_25px_rgba(0,0,0,0.12)]
 
                       hover:bg-gray-750
@@ -674,7 +674,7 @@ function Message({ message, onEditMessage }) {
                   ${
                     isAI
                       ? "text-gray-400 dark:text-gray-600"
-                      : "text-gray-400 dark:text-gray-500"
+                      : "text-gray-500 dark:text-gray-500"
                   }
                 `}
               >
@@ -708,15 +708,15 @@ function Message({ message, onEditMessage }) {
                   items-center
                   justify-center
                   rounded-lg
-                  border
-                  border-gray-600
-                  bg-gray-700/90
-                  text-gray-300
+                  
+                  
+                  
+                  text-gray-600
                   opacity-0
                   shadow-sm
                   backdrop-blur-xl
                   transition
-                  hover:bg-gray-600
+                  hover:bg-gray-400
                   hover:text-white
                   group-hover:opacity-100
                   max-sm:opacity-100
@@ -739,7 +739,7 @@ function Message({ message, onEditMessage }) {
                 flex h-8 w-8
                 items-center justify-center
                 rounded-lg
-                border
+                
                 shadow-sm
                 backdrop-blur-xl
                 transition-all
@@ -750,9 +750,9 @@ function Message({ message, onEditMessage }) {
                     ? `
                       right-1
                       translate-x-full
-                      border-gray-200
+                      
                       bg-white/90
-                      text-gray-400
+                      text-gray-600
                       hover:bg-white
                       hover:text-gray-700
                       dark:border-white/10
@@ -765,9 +765,9 @@ function Message({ message, onEditMessage }) {
                       left-1
                       -translate-x-full
                       border-gray-600
-                      bg-gray-700/90
-                      text-gray-300
-                      hover:bg-gray-600
+                      
+                      text-gray-600
+                      hover:bg-gray-300
                       hover:text-white
                       dark:border-white/10
                       dark:bg-white/10
@@ -799,34 +799,6 @@ function Message({ message, onEditMessage }) {
         )}
       </div>
 
-      {/* ================= USER ICON ================= */}
-
-      {!isAI && (
-        <div
-          className="
-            mt-1
-            flex h-9 w-9 shrink-0
-            items-center justify-center
-            rounded-full
-            border border-white
-            bg-gradient-to-br
-            from-gray-200
-            to-gray-400
-            text-xs
-            font-bold
-            text-gray-700
-            shadow-[0_5px_15px_rgba(0,0,0,0.1)]
-            dark:border-white/10
-            dark:from-gray-700
-            dark:to-gray-900
-            dark:text-white
-            sm:h-10
-            sm:w-10
-          "
-        >
-          Y
-        </div>
-      )}
     </div>
   );
 }

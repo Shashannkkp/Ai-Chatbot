@@ -260,15 +260,15 @@ function App() {
     <div
       className="
         min-h-[100dvh]
+    
         w-full
         bg-[#eef0f2]
         p-0
-
+        h-screen overflow-hidden
         transition-colors
         duration-300
 
         dark:bg-[#090b0d]
-
         sm:p-3
         md:p-4
       "
@@ -337,7 +337,8 @@ function App() {
         className="
           relative
           flex
-          min-h-[100dvh]
+          h-screen
+          
           w-full
           overflow-hidden
 

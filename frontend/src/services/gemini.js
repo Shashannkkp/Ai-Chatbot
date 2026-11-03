@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:5000/api/chat";
+
+const API_URL = "/api/chat";
 
 export async function generateResponse(message) {
   const response = await fetch(API_URL, {
@@ -7,7 +8,7 @@ export async function generateResponse(message) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      message: message,
+      message,
     }),
   });
 

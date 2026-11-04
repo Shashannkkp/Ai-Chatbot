@@ -15,9 +15,9 @@ import {
   LogIn,
   X,
   Trash2,
-  Pencil,
-  Check,
   Search,
+  PanelLeftOpen,
+  PanelLeftClose,
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
@@ -31,6 +31,8 @@ function Sidebar({
   onRenameChat,
   sidebarOpen = false,
   setSidebarOpen,
+  sidebarCollapsed = false,
+  setSidebarCollapsed,
 }) {
   const { user, login, logout } = useAuth();
 
@@ -369,38 +371,43 @@ const handleSearchResultClick = (chatId) => {
 
       <aside
         className={`
-          fixed left-0 top-0 z-50
-          flex h-[100dvh] w-[290px]
-          shrink-0 flex-col
-          
-    
-          bg-white/95
-          p-3
-          shadow-[0_20px_50px_rgba(0,0,0,0.15)]
-          backdrop-blur-xl
-          transition-all duration-300 ease-out
+  fixed left-0 top-0 z-50
+flex h-[100dvh] w-[290px]
+min-w-0 shrink-0 flex-col
+overflow-hidden
 
-          dark:border-white/10
-          dark:bg-[#111416]/95
-          dark:shadow-[0_20px_50px_rgba(0,0,0,0.45)]
+  bg-white/95
+  p-3
+  shadow-[0_20px_50px_rgba(0,0,0,0.15)]
+  backdrop-blur-xl
+  transition-all duration-300 ease-out
 
-          sm:relative
-          sm:left-auto
-          sm:top-auto
-          sm:z-auto
-          sm:h-full
-          sm:w-67
-          sm:rounded-3xl
-          sm:bg-white/70
-          sm:shadow-[0_20px_50px_rgba(0,0,0,0.06)]
-          sm:dark:bg-[#111416]/90
+  dark:border-white/10
+  dark:bg-[#111416]/95
+  dark:shadow-[0_20px_50px_rgba(0,0,0,0.45)]
 
-          ${
-            sidebarOpen
-              ? "translate-x-0"
-              : "-translate-x-full sm:translate-x-0"
-          }
-        `}
+  sm:relative
+  sm:left-auto
+  sm:top-auto
+  sm:z-auto
+  sm:h-full
+  sm:rounded-3xl
+  sm:bg-white/70
+  sm:shadow-[0_20px_50px_rgba(0,0,0,0.06)]
+  sm:dark:bg-[#111416]/90
+
+  ${
+    sidebarOpen
+      ? "translate-x-0"
+      : "-translate-x-full sm:translate-x-0"
+  }
+
+  ${
+    sidebarCollapsed
+      ? "sm:w-0 sm:min-w-0 sm:p-0 sm:border-0"
+      : "sm:w-[268px] sm:min-w-[268px]"
+  }
+`}
       >
 
 {/* ================= FIXED HEADER ================= */}
@@ -427,8 +434,6 @@ const handleSearchResultClick = (chatId) => {
         </div>
 
         {/* ================= LOGO ================= */}
-
-       {/* ================= LOGO ================= */}
 
 <div className="mb-4 flex items-center justify-between px-2">
   <div className="flex items-center gap-3">
@@ -472,6 +477,30 @@ const handleSearchResultClick = (chatId) => {
     </h2>
   </div>
 
+ <div className="flex items-center gap-1">
+  {/* DESKTOP SIDEBAR TOGGLE */}
+  <button
+    type="button"
+    onClick={() =>
+      setSidebarCollapsed?.(!sidebarCollapsed)
+    }
+    title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+    aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+    className="
+      hidden sm:flex h-9 w-9 items-center justify-center
+      rounded-xl text-gray-500
+      transition-all hover:bg-gray-100 hover:text-gray-900
+      dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white
+    "
+  >
+    {sidebarCollapsed ? (
+      <PanelLeftOpen size={19} />
+    ) : (
+      <PanelLeftClose size={19} />
+    )}
+  </button>
+
+  {/* SEARCH */}
   <button
     type="button"
     onClick={openSearchView}
@@ -479,18 +508,14 @@ const handleSearchResultClick = (chatId) => {
     aria-label="Search chats"
     className="
       flex h-9 w-9 items-center justify-center
-      rounded-xl
-      text-gray-500
-      transition-all
-      hover:bg-gray-100
-      hover:text-gray-900
-      dark:text-gray-400
-      dark:hover:bg-white/10
-      dark:hover:text-white
+      rounded-xl text-gray-500
+      transition-all hover:bg-gray-100 hover:text-gray-900
+      dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white
     "
   >
     <Search size={19} />
   </button>
+</div>
 </div>
 
         {/* ================= NEW CHAT ================= */}

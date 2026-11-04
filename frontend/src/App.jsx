@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Menu } from "lucide-react";
+import { Menu, PanelLeftOpen, PanelLeftClose } from "lucide-react";
 
 import Sidebar from "./components/Sidebar";
 import Chat from "./components/Chat";
@@ -7,37 +7,35 @@ import { useAuth } from "./context/AuthContext";
 
 function App() {
   const { token } = useAuth();
-
-  // =========================================================
-  // CHATS
-  // =========================================================
+  const previousToken = useRef(token);
 
   const [chats, setChats] = useState([]);
 
-  // =========================================================
-  // ACTIVE CHAT
-  // =========================================================
-
   const [activeChatId, setActiveChatId] = useState(null);
-
-  // =========================================================
-  // DARK MODE
-  // =========================================================
 
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("nova-ai-dark-mode") === "true";
   });
 
   // =========================================================
-  // MOBILE SIDEBAR
-  // =========================================================
+// SIDEBAR STATE
+// =========================================================
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const previousToken = useRef(token);
+// Mobile sidebar
+const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    localStorage.removeItem("nova-ai-chats");
-  }, []);
+// Desktop sidebar
+const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+  return localStorage.getItem("nova-ai-sidebar-collapsed") === "true";
+});
+
+// Save desktop sidebar preference
+useEffect(() => {
+  localStorage.setItem(
+    "nova-ai-sidebar-collapsed",
+    String(sidebarCollapsed)
+  );
+}, [sidebarCollapsed]);
 
   // =========================================================
   // LOAD ACCOUNT CHATS
@@ -269,8 +267,6 @@ function App() {
         duration-300
 
         dark:bg-[#090b0d]
-        sm:p-3
-        md:p-4
       "
     >
       {/* ===================================================== */}
@@ -335,37 +331,23 @@ function App() {
 
       <div
         className="
-          relative
-          flex
-          h-screen
-          
-          w-full
-          overflow-hidden
-
-          rounded-none
-          border-0
-
-          bg-white/70
-
-          shadow-none
-
-          backdrop-blur-3xl
-
-          transition-colors
-          duration-300
-
-          dark:border-white/10
-          dark:bg-[#111416]/90
-
-          sm:h-[calc(100dvh-24px)]
-          sm:flex-row
-          sm:rounded-[24px]
-          sm:border
-          sm:border-white/80
-          sm:shadow-[0_25px_80px_rgba(0,0,0,0.08)]
-
-          md:rounded-[28px]
-        "
+  relative
+  flex
+  h-full
+  w-full
+  min-h-0
+  min-w-0
+  overflow-hidden
+  m-0
+  rounded-none
+  border-0
+  bg-white/70
+  shadow-none
+  backdrop-blur-3xl
+  transition-colors
+  duration-300
+  dark:bg-[#111416]/90
+"
       >
         {/* =================================================== */}
         {/* MOBILE MENU BUTTON */}
@@ -432,6 +414,9 @@ function App() {
           onRenameChat={handleRenameChat}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
+         sidebarCollapsed={sidebarCollapsed}
+         setSidebarCollapsed={setSidebarCollapsed}
+
         />
 
         {/* =================================================== */}
@@ -439,21 +424,58 @@ function App() {
         {/* =================================================== */}
 
         <main
-          className="
-            min-h-0
-            min-w-0
-            w-full
-            flex-1
-            overflow-hidden
-          "
-        >
-          <Chat
-            chat={activeChat}
-            onUpdateChat={handleUpdateChat}
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-          />
-        </main>
+  className="
+    relative
+    min-h-0
+    min-w-0
+    w-full
+    flex-1
+    overflow-hidden
+  "
+>
+  {sidebarCollapsed && (
+    <button
+      type="button"
+      onClick={() => setSidebarCollapsed(false)}
+      title="Open sidebar"
+      aria-label="Open sidebar"
+      className="
+        absolute
+        left-4
+        top-4
+        z-30
+        hidden
+        h-10
+        w-10
+        items-center
+        justify-center
+        rounded-xl
+        border
+        border-gray-200
+        bg-white/90
+        text-gray-700
+        shadow-sm
+        backdrop-blur-xl
+        transition
+        hover:bg-gray-100
+        dark:border-white/10
+        dark:bg-[#171a1d]/90
+        dark:text-white
+        dark:hover:bg-white/10
+        sm:flex
+      "
+    >
+      <PanelLeftOpen size={19} />
+    </button>
+  )}
+
+  <Chat
+    chat={activeChat}
+    onUpdateChat={handleUpdateChat}
+    darkMode={darkMode}
+    setDarkMode={setDarkMode}
+  />
+</main>
       </div>
     </div>
   );

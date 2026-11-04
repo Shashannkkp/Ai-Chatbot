@@ -120,11 +120,23 @@ function Chat({ chat, onUpdateChat, darkMode, setDarkMode }) {
         }),
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
 
-      if (!response.ok) {
-        throw new Error(data?.error || "Failed to get response");
-      }
+let data = {};
+
+try {
+  data = responseText ? JSON.parse(responseText) : {};
+} catch {
+  throw new Error(
+    `Invalid server response (${response.status}): ${responseText.slice(0, 300)}`
+  );
+}
+
+if (!response.ok) {
+  throw new Error(
+    data?.error || `Request failed with status ${response.status}`
+  );
+}
 
       const aiMessage = {
         id: Date.now() + 1,
@@ -160,7 +172,10 @@ function Chat({ chat, onUpdateChat, darkMode, setDarkMode }) {
         updateChat(finalMessages);
       }
     } catch (error) {
-      console.error("Chat error:", error);
+      console.error("Chat error:", {
+  message: error.message,
+  stack: error.stack,
+});
 
       const errorMessage = {
         id: Date.now() + 1,

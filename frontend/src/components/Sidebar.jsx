@@ -57,9 +57,12 @@ function Sidebar({
   const [editingTitle, setEditingTitle] = useState("");
   const renameInputRef = useRef(null);
 
-  // ================= SEARCH =================
+// ================= SEARCH =================
 
-  const [searchQuery, setSearchQuery] = useState("");
+const [searchQuery, setSearchQuery] = useState("");
+const [searchViewOpen, setSearchViewOpen] = useState(false);
+
+const searchInputRef = useRef(null);
 
   // ================= CLOSE PROFILE =================
 
@@ -117,6 +120,23 @@ function Sidebar({
     onSelectChat(chatId);
     closeSidebar();
   };
+
+  // ================= SEARCH VIEW =================
+
+const openSearchView = () => {
+  setSearchViewOpen(true);
+  setSearchQuery("");
+};
+
+const closeSearchView = () => {
+  setSearchViewOpen(false);
+  setSearchQuery("");
+};
+
+const handleSearchResultClick = (chatId) => {
+  handleSelectChatClick(chatId);
+  closeSearchView();
+};
 
   // ================= DELETE CHAT =================
 
@@ -352,7 +372,7 @@ function Sidebar({
           fixed left-0 top-0 z-50
           flex h-[100dvh] w-[290px]
           shrink-0 flex-col
-          rounded-r-3xl
+          
     
           bg-white/95
           p-3
@@ -382,6 +402,11 @@ function Sidebar({
           }
         `}
       >
+
+{/* ================= FIXED HEADER ================= */}
+
+<div className="shrink-0">
+
         {/* ================= MOBILE CLOSE ================= */}
 
         <div className="mb-4 flex justify-end sm:hidden">
@@ -403,46 +428,70 @@ function Sidebar({
 
         {/* ================= LOGO ================= */}
 
-        <div className="mb-8 flex items-center gap-3 px-2">
-          <div
-            className="
-              relative flex h-12 w-12 shrink-0
-              items-center justify-center
-              rounded-2xl
-              border border-white
-              bg-gradient-to-br
-              from-gray-100 to-gray-300
-              text-gray-700
-              shadow-[inset_0_1px_2px_white,0_8px_20px_rgba(0,0,0,0.08)]
-              dark:border-white/10
-              dark:from-gray-700
-              dark:to-gray-900
-              dark:text-white
-            "
-          >
-            <Globe2 size={25} strokeWidth={1.6} />
+       {/* ================= LOGO ================= */}
 
-            <span
-              className="
-                absolute right-0 top-0
-                h-3 w-3 rounded-full
-                border-2 border-white
-                bg-emerald-400
-                dark:border-[#111416]
-              "
-            />
-          </div>
+<div className="mb-4 flex items-center justify-between px-2">
+  <div className="flex items-center gap-3">
+    <div
+      className="
+        relative flex h-9 w-9 shrink-0
+        items-center justify-center
+        rounded-2xl
+        border border-white
+        bg-gradient-to-br
+        from-gray-100 to-gray-300
+        text-gray-700
+        shadow-[inset_0_1px_2px_white,0_8px_20px_rgba(0,0,0,0.08)]
+        dark:border-white/10
+        dark:from-gray-700
+        dark:to-gray-900
+        dark:text-white
+      "
+    >
+      <Globe2 size={20} strokeWidth={1.3} />
 
-          <h1
-            className="
-              text-3xl font-bold tracking-tight
-              text-gray-900
-              dark:text-white
-            "
-          >
-            Nova-Ai
-          </h1>
-        </div>
+      <span
+        className="
+          absolute right-0 top-0
+          h-3 w-3 rounded-full
+          border-2 border-white
+          bg-emerald-400
+          dark:border-[#111416]
+        "
+      />
+    </div>
+
+    <h2
+      className="
+        text-2xl font-bold tracking-tight
+        text-gray-900
+        dark:text-white
+      "
+    >
+      Nova
+    </h2>
+  </div>
+
+  <button
+    type="button"
+    onClick={openSearchView}
+    title="Search chats"
+    aria-label="Search chats"
+    className="
+      flex h-9 w-9 items-center justify-center
+      rounded-xl
+      text-gray-500
+      transition-all
+      hover:bg-gray-100
+      hover:text-gray-900
+      dark:text-gray-400
+      dark:hover:bg-white/10
+      dark:hover:text-white
+    "
+  >
+    <Search size={19} />
+  </button>
+</div>
 
         {/* ================= NEW CHAT ================= */}
 
@@ -450,11 +499,11 @@ function Sidebar({
           type="button"
           onClick={handleNewChatClick}
           className="
-            group mb-7 flex w-full items-center
+            group mb-2 flex w-full items-center
             justify-center gap-2
             rounded-2xl
-            border border-white
-            bg-white/90
+            border border-sky-400
+            bg-sky-200
             px-4 py-3.5
             text-base font-semibold
             text-gray-800
@@ -462,15 +511,12 @@ function Sidebar({
             transition-all duration-200
             hover:-translate-y-0.5
             hover:bg-white
-            active:scale-[0.98]
-            dark:border-white/10
-            dark:bg-white/10
             dark:text-white
           "
         >
           <span
             className="
-              flex h-7 w-7 items-center
+              flex h-5 w-5 items-center
               justify-center rounded-lg
               bg-gray-100 text-gray-600
               dark:bg-white/10 dark:text-gray-300
@@ -482,404 +528,291 @@ function Sidebar({
           New Chat
         </button>
 
-        {/* ================= MENU ================= */}
+      </div>
 
-        <p
-          className="
-            mb-1 px-2 text-base font-bold
-            uppercase tracking-[0.18em]
-            text-black dark:text-gray-400
-            
-          "
-        >
-          Menu
-        </p>
+{/* ================= SCROLLABLE MIDDLE ================= */}
 
-      
-<div className="space-y-1">
-  <div className="rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md">
-    <SidebarItem
-      icon={<Compass size={18} />}
-      text="Market Daily"
-    />
-  </div>
+<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0">
 
-  <div className="rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md">
-    <SidebarItem
-      icon={<Star size={18} />}
-      text="My Portfolio"
-    />
-  </div>
+{searchViewOpen ? (
+  /* ================= SEARCH VIEW ================= */
+  <div className="flex min-h-full flex-col">
 
-  <div className="rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md">
-    <SidebarItem
-      icon={<FileText size={18} />}
-      text="My Project"
-    />
-  </div>
-</div>
+    {/* SEARCH HEADER */}
 
-        {/* ================= DIVIDER ================= */}
-
-        <div
-          className="
-            my-1 h-px
-            bg-gradient-to-r
-            from-transparent
-            via-gray-200
-            to-transparent
-            dark:via-white/10
-          "
+    <div className="mb-4 flex items-center gap-2">
+      <button
+        type="button"
+        onClick={closeSearchView}
+        aria-label="Back to sidebar"
+        className="
+          flex h-9 w-9 shrink-0 items-center justify-center
+          rounded-xl text-gray-500
+          hover:bg-gray-100
+          dark:text-gray-400 dark:hover:bg-white/10
+        "
+      >
+        <ChevronRight
+          size={19}
+          className="rotate-180"
         />
+      </button>
 
-        {/* ================= RECENT ================= */}
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        Search
+      </h3>
+    </div>
 
-        <div className="mb-3 flex items-center justify-between px-2">
-          <p
-            className="
-              text-base font-bold uppercase
-              tracking-[0.18em]
-              text-black dark:text-gray-400
-            "
+    {/* SEARCH INPUT */}
+
+    <div
+      className="
+        mb-4 flex items-center gap-2
+        rounded-xl border border-gray-200
+        bg-white/80 px-3 py-3 shadow-sm
+        focus-within:ring-2 focus-within:ring-gray-300/30
+        dark:border-white/10 dark:bg-white/5
+      "
+    >
+      <Search size={17} className="shrink-0 text-gray-400" />
+
+      <input
+        ref={searchInputRef}
+        type="text"
+        value={searchQuery}
+        onChange={(event) =>
+          setSearchQuery(event.target.value)
+        }
+        placeholder="Search your conversations..."
+        autoFocus
+        className="
+          min-w-0 flex-1 bg-transparent
+          text-sm text-gray-800 outline-none
+          placeholder:text-gray-400 dark:text-white
+        "
+      />
+
+      {searchQuery && (
+        <button
+          type="button"
+          onClick={() => {
+            setSearchQuery("");
+            searchInputRef.current?.focus();
+          }}
+          aria-label="Clear search"
+          className="text-gray-400 hover:text-gray-700 dark:hover:text-white"
+        >
+          <X size={15} />
+        </button>
+      )}
+    </div>
+
+    {/* SEARCH RESULTS */}
+
+    <p className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+      {searchQuery.trim()
+        ? "Search results"
+        : "Recent conversations"}
+    </p>
+
+    <div className="space-y-1">
+      {chats.length === 0 ? (
+        <EmptyChats
+          icon={<MessageSquare size={17} />}
+          title="No conversations yet"
+          description="Start a conversation to see it here."
+        />
+      ) : filteredChats.length === 0 ? (
+        <EmptyChats
+          icon={<Search size={17} />}
+          title="No results found"
+          description="Try searching with a different title."
+        />
+      ) : (
+        filteredChats.map((chat) => (
+          <button
+            key={chat.id}
+            type="button"
+            onClick={() =>
+              handleSearchResultClick(chat.id)
+            }
+            className={`
+              flex w-full items-center gap-3
+              rounded-xl px-3 py-3 text-left
+              transition-all
+              ${
+                activeChatId === chat.id
+                  ? "bg-gray-100 dark:bg-white/10"
+                  : "hover:bg-gray-100 dark:hover:bg-white/5"
+              }
+            `}
           >
-            Recent
-          </p>
-
-          {chats.length > 0 && (
             <span
               className="
-                rounded-full
-                bg-gray-100
-                px-2 py-0.5
-                text-sm font-semibold
-                text-gray-500
-                dark:bg-white/10
-                dark:text-gray-400
+                flex h-9 w-9 shrink-0 items-center justify-center
+                rounded-lg bg-gray-100 text-gray-500
+                dark:bg-white/5 dark:text-gray-400
               "
             >
-              {chats.length}
+              <MessageSquare size={16} />
             </span>
-          )}
-        </div>
 
-        {/* ================= SEARCH ================= */}
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-medium text-gray-800 dark:text-gray-200">
+                {chat.title || "New Conversation"}
+              </span>
 
-        {chats.length > 0 && (
-          <div className="mb-3 px-1">
-            <div
-              className="
-                flex items-center gap-2
-                rounded-xl
-                border border-gray-200
-                bg-white/80
-                px-3 py-2.5
-                shadow-sm
-                focus-within:ring-2
-                focus-within:ring-gray-300/30
-                dark:border-white/10
-                dark:bg-white/5
-              "
-            >
-              <Search
-                size={16}
-                className="shrink-0 text-gray-400"
-              />
+              <span className="mt-1 block text-[11px] text-gray-400">
+                {chat.messages?.length || 0} messages
+                {chat.updatedAt &&
+                  ` · ${formatChatTime(chat.updatedAt)}`}
+              </span>
+            </span>
 
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(event) =>
-                  setSearchQuery(event.target.value)
-                }
-                placeholder="Search chats..."
-                className="
-                  min-w-0 flex-1
-                  bg-transparent
-                  text-sm text-gray-800
-                  outline-none
-                  placeholder:text-gray-400
-                  dark:text-white
-                "
-              />
+            <ChevronRight
+              size={15}
+              className="shrink-0 text-gray-400"
+            />
+          </button>
+        ))
+      )}
+    </div>
+  </div>
+) : (
+  /* ================= NORMAL SIDEBAR VIEW ================= */
+  <>
+    {/* ================= MENU ================= */}
 
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="text-gray-400"
-                >
-                  <X size={13} />
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+    <p
+      className="
+        mb-1 px-2 text-base font-bold
+        uppercase tracking-[0.18em]
+        text-black dark:text-gray-400
+      "
+    >
+      Menu
+    </p>
 
-        {/* ================= CHAT LIST ================= */}
+    <div className="space-y-1">
+      <div className="rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md">
+        <SidebarItem
+          icon={<Compass size={18} />}
+          text="Market Daily"
+        />
+      </div>
 
-        <div
+      <div className="rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md">
+        <SidebarItem
+          icon={<Star size={18} />}
+          text="Daily News"
+        />
+      </div>
+
+      <div className="rounded-xl transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-md">
+        <SidebarItem
+          icon={<FileText size={18} />}
+          text="My Project"
+        />
+      </div>
+    </div>
+
+    {/* ================= DIVIDER ================= */}
+
+    <div
+      className="
+        my-1 h-px bg-gradient-to-r
+        from-transparent via-gray-200 to-transparent
+        dark:via-white/10
+      "
+    />
+
+    {/* ================= RECENT ================= */}
+
+    <div className="mb-2 flex items-center justify-between px-2">
+      <p
+        className="
+          text-base font-bold uppercase
+          tracking-[0.18em]
+          text-black dark:text-gray-400
+        "
+      >
+        Recent
+      </p>
+
+      {chats.length > 0 && (
+        <span
           className="
-            min-h-0 flex-1 space-y-1
-            overflow-y-auto pr-1
+            rounded-full bg-gray-100
+            px-2 py-0.5 text-sm font-semibold
+            text-gray-500
+            dark:bg-white/10 dark:text-gray-400
           "
         >
-          {chats.length === 0 ? (
-            <EmptyChats
-              icon={<MessageSquare size={17} />}
-              title="No recent chats"
-              description="Start a conversation and it will appear here."
-            />
-          ) : filteredChats.length === 0 ? (
-            <EmptyChats
-              icon={<Search size={17} />}
-              title="No chats found"
-              description="Try a different search term."
-            />
-          ) : (
-            filteredChats.map((chat) => (
-              <div
-                key={chat.id}
-                className="group relative"
-              >
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleSelectChatClick(chat.id)
-                  }
-                  className={`
-                    group/chat flex w-full
-                    items-center gap-3
-                    rounded-xl px-3 py-3 pr-11
-                    text-left transition-all duration-200
+          {chats.length}
+        </span>
+      )}
+    </div>
 
-                    ${
-                      activeChatId === chat.id
-                        ? `
-                          bg-gray-900
-                          text-white
-                          dark:bg-white/15
-                        `
-                        : `
-                          text-gray-600
-                          hover:bg-white
-                          hover:text-gray-900
-                          dark:text-gray-400
-                          dark:hover:bg-white/10
-                          dark:hover:text-white
-                        `
-                    }
-                  `}
-                >
-                  <span
-                    className={`
-                      flex h-8 w-8 shrink-0
-                      items-center justify-center
-                      rounded-lg
+{/* ================= CHAT LIST ================= */}
 
-                      ${
-                        activeChatId === chat.id
-                          ? "bg-white/10 text-white"
-                          : "bg-gray-100/70 text-gray-500 dark:bg-white/5"
-                      }
-                    `}
-                  >
-                    <MessageSquare size={15} />
-                  </span>
+<div className="space-y-1">
+  {chats.length === 0 ? (
+    <EmptyChats
+      icon={<MessageSquare size={17} />}
+      title="No recent chats"
+      description="Start a conversation and it will appear here."
+    />
+  ) : (
+    filteredChats.map((chat) => (
+      <div
+        key={chat.id}
+        className="group flex w-full items-center rounded-lg px-2 py-2"
+      >
+        {/* CHAT TITLE */}
+        <button
+          type="button"
+          onClick={() => handleSelectChatClick(chat.id)}
+          title={chat.title}
+          className={`min-w-0 max-w-[180px] truncate text-left text-sm transition-colors ${
+            activeChatId === chat.id
+              ? "font-semibold text-black dark:text-white"
+              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+          }`}
+        >
+          {chat.title}
+        </button>
 
-                  <div className="min-w-0 flex-1">
-                    {editingChatId === chat.id ? (
-                      <input
-                        ref={renameInputRef}
-                        type="text"
-                        value={editingTitle}
-                        onChange={(event) =>
-                          setEditingTitle(
-                            event.target.value
-                          )
-                        }
-                        onClick={(event) =>
-                          event.stopPropagation()
-                        }
-                        onKeyDown={(event) =>
-                          handleRenameKeyDown(
-                            event,
-                            chat.id
-                          )
-                        }
-                        className="
-                          w-full rounded-md
-                          border border-gray-300
-                          bg-white px-2 py-1
-                          text-sm text-gray-900
-                          outline-none
-                          dark:border-white/20
-                          dark:bg-[#1b1f22]
-                          dark:text-white
-                        "
-                      />
-                    ) : (
-                      <>
-                        <p
-                          className={`
-                            truncate text-sm font-medium
-                            ${
-                              activeChatId === chat.id
-                                ? "text-white"
-                                : "text-gray-700 dark:text-gray-300"
-                            }
-                          `}
-                        >
-                          {chat.title ||
-                            "New Conversation"}
-                        </p>
+        {/* DELETE - FAR RIGHT */}
+        <button
+          type="button"
+          onClick={(event) => handleDeleteChatClick(event, chat.id)}
+          title="Delete chat"
+          className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-gray-400 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-white/5"
+        >
+          <Trash2 size={15} />
+        </button>
+      </div>
+    ))
+  )}
+</div>
 
-                        <div className="mt-0.5 flex items-center gap-1.5">
-                          <p className="text-[10px] text-gray-400">
-                            {chat.messages?.length || 0} messages
-                          </p>
+</>
+)}
 
-                          {chat.updatedAt && (
-                            <>
-                              <span className="text-[9px] text-gray-400">
-                                •
-                              </span>
+</div>
 
-                              <p className="text-[10px] text-gray-400">
-                                {formatChatTime(
-                                  chat.updatedAt
-                                )}
-                              </p>
-                            </>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
+{/* ================= FIXED BOTTOM ================= */}
 
-                  {editingChatId !== chat.id && (
-                    <ChevronRight
-                      size={15}
-                      className="
-                        shrink-0 text-gray-300
-                        opacity-0
-                        group-hover/chat:opacity-100
-                      "
-                    />
-                  )}
-                </button>
-
-                {/* RENAME */}
-
-                {editingChatId === chat.id ? (
-                  <div
-                    className="
-                      absolute right-2 top-1/2 z-10
-                      flex -translate-y-1/2 gap-1
-                    "
-                  >
-                    <button
-                      type="button"
-                      onClick={(event) =>
-                        handleRenameSave(
-                          event,
-                          chat.id
-                        )
-                      }
-                      className="
-                        flex h-8 w-8
-                        items-center justify-center
-                        rounded-lg
-                        bg-emerald-500
-                        text-white
-                      "
-                    >
-                      <Check size={15} />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleRenameCancel}
-                      className="
-                        flex h-8 w-8
-                        items-center justify-center
-                        rounded-lg
-                        bg-gray-200
-                        text-gray-500
-                        dark:bg-white/10
-                        dark:text-gray-300
-                      "
-                    >
-                      <X size={15} />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={(event) =>
-                      handleRenameStart(
-                        event,
-                        chat
-                      )
-                    }
-                    className="
-                      absolute right-11 top-1/2
-                      z-10 flex h-8 w-8
-                      -translate-y-1/2
-                      items-center justify-center
-                      rounded-lg
-                      bg-gray-100
-                      text-gray-400
-                      opacity-0
-                      transition-all
-                      group-hover:opacity-100
-                      dark:bg-white/5
-                    "
-                  >
-                    <Pencil size={14} />
-                  </button>
-                )}
-
-                {/* DELETE */}
-
-                <button
-                  type="button"
-                  onClick={(event) =>
-                    handleDeleteChatClick(
-                      event,
-                      chat.id
-                    )
-                  }
-                  className="
-                    absolute right-2 top-1/2
-                    z-10 flex h-8 w-8
-                    -translate-y-1/2
-                    items-center justify-center
-                    rounded-lg
-                    bg-gray-100
-                    text-gray-400
-                    opacity-0
-                    transition-all
-                    group-hover:opacity-100
-                    hover:bg-red-50
-                    hover:text-red-500
-                    dark:bg-white/5
-                  "
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            ))
-          )}
-        </div>
+<div className="relative mt-2 shrink-0">
 
         {/* ========================================================= */}
         {/* AUTH / USER SECTION */}
         {/* ========================================================= */}
 
         <div
-          ref={profileRef}
-          className="relative mt-2"
-        >
+  ref={profileRef}
+  className="relative"
+>
           {user ? (
             <>
               {/* LOGGED IN */}
@@ -1175,6 +1108,7 @@ function Sidebar({
             </>
           )}
         </div>
+</div>
       </aside>
 
       {/* ========================================================= */}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Globe2, Copy, Check, Pencil } from "lucide-react";
+import { Copy, Check, Pencil } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -77,45 +77,18 @@ function Message({ message, onEditMessage }) {
         ${isAI ? "justify-start" : "justify-end"}
       `}
     >
-      {/* ================= AI ICON ================= */}
-
-      {isAI && (
-        <div
-          className="
-            mt-1
-            flex h-9 w-9 shrink-0
-            items-center justify-center
-            rounded-xl
-             
-            bg-white/90
-            text-gray-500
-            shadow-[0_4px_15px_rgba(0,0,0,0.06)]
-            backdrop-blur-xl
-            transition-all
-            duration-300
-            group-hover:scale-105
-          
-          
-            dark:text-gray-300
-            sm:h-10
-            sm:w-10
-          "
-        >
-          <Globe2 size={18} strokeWidth={1.6} />
-        </div>
-      )}
 
       {/* ================= MESSAGE AREA ================= */}
 
-      <div
-        className={`
-          relative min-w-0
-          max-w-[calc(100%-48px)]
-          sm:max-w-[85%]
-          md:max-w-[75%]
-          ${isAI ? "mr-auto" : "ml-auto"}
-        `}
-      >
+    <div
+  className={`
+    relative min-w-0
+    ${isAI
+      ? "w-full max-w-full mr-auto"
+      : "w-fit max-w-[75%] ml-auto"
+    }
+  `}
+>
         {/* ================= EDIT MODE ================= */}
 
         {!isAI && isEditing ? (
@@ -216,42 +189,24 @@ function Message({ message, onEditMessage }) {
 
             <div
               className={`
-                relative overflow-hidden
-                rounded-2xl
-                px-4 py-3.5
-                sm:px-5 sm:py-4
+              relative overflow-hidden
+w-fit max-w-full
+rounded-2xl
+px-4 py-2
                 shadow-[0_6px_20px_rgba(0,0,0,0.04)]
                 transition-all
                 duration-300
 
                 ${
                   isAI
-                    ? `
-                      rounded-tl-md
-                      
-                      bg-white/90
-                      text-gray-700
-                      backdrop-blur-xl
-
-                      hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)]
-
-              
-                      
-                      dark:text-gray-300
-                    `
+  ? `
+      rounded-none bg-transparent p-0 shadow-none
+      text-gray-800 dark:text-gray-200
+    `
                     : `
-                      rounded
-                    
-                      bg-blue-300
-                      text-gray-600
-                      shadow-[0_8px_25px_rgba(0,0,0,0.12)]
-
-                      hover:bg-gray-750
-
-                      dark:border-white/10
-                      dark:bg-[#24292d]
-                      dark:text-white
-                      dark:hover:bg-[#292f34]
+                     rounded-2xl bg-[#dbeafe] px-4 py-2
+text-gray-800 shadow-sm
+dark:bg-[#263b50] dark:text-gray-100
                     `
                 }
               `}
@@ -278,7 +233,7 @@ function Message({ message, onEditMessage }) {
               {/* ================= AI MESSAGE ================= */}
 
               {isAI ? (
-                <div className="relative text-[14px] leading-7 sm:text-[15px]">
+                <div className="relative text-[16px] leading-7 sm:text-[18px]">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
@@ -654,10 +609,9 @@ function Message({ message, onEditMessage }) {
 
                 <p
                   className="
-                    whitespace-pre-wrap
-                    text-[14px]
-                    leading-7
-                    sm:text-[15px]
+                   whitespace-pre-wrap
+                  text-[18px]
+                  leading-6
                   "
                 >
                   {message.text}
@@ -666,135 +620,89 @@ function Message({ message, onEditMessage }) {
 
               {/* ================= TIME ================= */}
 
-              <p
-                className={`
-                  mt-2.5
-                  text-[10px]
-                  font-medium
-                  ${
-                    isAI
-                      ? "text-gray-400 dark:text-gray-600"
-                      : "text-gray-500 dark:text-gray-500"
-                  }
-                `}
-              >
-                {message.timestamp
-                  ? new Date(
-                      message.timestamp
-                    ).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "Just now"}
-              </p>
+              {isAI && (
+  <p
+    className="
+      mt-2.5
+      text-[10px]
+      font-medium
+      text-gray-400 dark:text-gray-600
+    "
+  >
+    {message.timestamp
+      ? new Date(message.timestamp).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "Just now"}
+  </p>
+)}
             </div>
 
-            {/* ================= EDIT BUTTON ================= */}
+           {/* ================= USER MESSAGE ACTIONS ================= */}
 
-            {!isAI && (
-              <button
-                type="button"
-                onClick={handleStartEdit}
-                title="Edit message"
-                aria-label="Edit message"
-                className="
-                  absolute
-                  bottom-12
-                  left-1
-                  -translate-x-full
-                  flex
-                  h-8
-                  w-8
-                  items-center
-                  justify-center
-                  rounded-lg
-                  
-                  
-                  
-                  text-gray-600
-                  opacity-0
-                  shadow-sm
-                  backdrop-blur-xl
-                  transition
-                  hover:bg-gray-400
-                  hover:text-white
-                  group-hover:opacity-100
-                  max-sm:opacity-100
-                "
-              >
-                <Pencil size={15} />
-              </button>
-            )}
 
-            {/* ================= COPY BUTTON ================= */}
+{!isAI && (
+  <div className="
+    mt-1
+    flex
+    items-center
+    justify-end
+    gap-1
+    opacity-0
+    transition-opacity
+    group-hover:opacity-100
+    max-sm:opacity-100
+  ">
+    {/* EDIT BUTTON */}
+    <button
+      type="button"
+      onClick={handleStartEdit}
+      title="Edit message"
+      aria-label="Edit message"
+      className="
+        flex h-7 w-7
+        items-center justify-center
+        rounded-lg
+        text-gray-500
+        transition
+        hover:bg-gray-200
+        hover:text-gray-800
+        dark:text-gray-400
+        dark:hover:bg-white/10
+        dark:hover:text-white
+      "
+    >
+      <Pencil size={15} />
+    </button>
 
-            <button
-              type="button"
-              onClick={handleCopy}
-              title={copied ? "Copied" : "Copy message"}
-              aria-label={copied ? "Copied" : "Copy message"}
-              className={`
-                absolute
-                bottom-2
-                flex h-8 w-8
-                items-center justify-center
-                rounded-lg
-                
-                shadow-sm
-                backdrop-blur-xl
-                transition-all
-                duration-200
-
-                ${
-                  isAI
-                    ? `
-                      right-1
-                      translate-x-full
-                      
-                      bg-white/90
-                      text-gray-600
-                      hover:bg-white
-                      hover:text-gray-700
-                      dark:border-white/10
-                      dark:bg-white/10
-                      dark:text-gray-400
-                      dark:hover:bg-white/15
-                      dark:hover:text-white
-                    `
-                    : `
-                      left-1
-                      -translate-x-full
-                      border-gray-600
-                      
-                      text-gray-600
-                      hover:bg-gray-300
-                      hover:text-white
-                      dark:border-white/10
-                      dark:bg-white/10
-                      dark:text-gray-400
-                      dark:hover:bg-white/15
-                      dark:hover:text-white
-                    `
-                }
-
-                ${
-                  copied
-                    ? "opacity-100"
-                    : "opacity-0 group-hover:opacity-100"
-                }
-
-                max-sm:opacity-100
-              `}
-            >
-              {copied ? (
-                <Check
-                  size={15}
-                  className="text-emerald-500"
-                />
-              ) : (
-                <Copy size={15} />
-              )}
-            </button>
+    {/* COPY BUTTON */}
+    <button
+      type="button"
+      onClick={handleCopy}
+      title={copied ? "Copied" : "Copy message"}
+      aria-label={copied ? "Copied" : "Copy message"}
+      className="
+        flex h-7 w-7
+        items-center justify-center
+        rounded-lg
+        text-gray-500
+        transition
+        hover:bg-gray-200
+        hover:text-gray-800
+        dark:text-gray-400
+        dark:hover:bg-white/10
+        dark:hover:text-white
+      "
+    >
+      {copied ? (
+        <Check size={15} className="text-emerald-500" />
+      ) : (
+        <Copy size={15} />
+      )}
+    </button>
+  </div>
+)}
           </>
         )}
       </div>

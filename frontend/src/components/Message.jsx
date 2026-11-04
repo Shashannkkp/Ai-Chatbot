@@ -641,7 +641,6 @@ dark:bg-[#263b50] dark:text-gray-100
 
            {/* ================= USER MESSAGE ACTIONS ================= */}
 
-
 {!isAI && (
   <div className="
     mt-1

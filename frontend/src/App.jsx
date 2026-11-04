@@ -17,9 +17,6 @@ function App() {
     return localStorage.getItem("nova-ai-dark-mode") === "true";
   });
 
-  // =========================================================
-// SIDEBAR STATE
-// =========================================================
 
 // Mobile sidebar
 const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -29,17 +26,12 @@ const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
   return localStorage.getItem("nova-ai-sidebar-collapsed") === "true";
 });
 
-// Save desktop sidebar preference
 useEffect(() => {
   localStorage.setItem(
     "nova-ai-sidebar-collapsed",
     String(sidebarCollapsed)
   );
 }, [sidebarCollapsed]);
-
-  // =========================================================
-  // LOAD ACCOUNT CHATS
-  // =========================================================
 
   useLayoutEffect(() => {
     if (!token) {
@@ -105,10 +97,6 @@ useEffect(() => {
     };
   }, [token]);
 
-  // =========================================================
-  // DARK MODE EFFECT
-  // =========================================================
-
   useEffect(() => {
     localStorage.setItem("nova-ai-dark-mode", darkMode);
 
@@ -117,10 +105,6 @@ useEffect(() => {
       darkMode
     );
   }, [darkMode]);
-
-  // =========================================================
-  // VALIDATE ACTIVE CHAT
-  // =========================================================
 
   useEffect(() => {
     if (
@@ -133,18 +117,10 @@ useEffect(() => {
     }
   }, [chats, activeChatId]);
 
-  // =========================================================
-  // NEW CHAT
-  // =========================================================
-
   const handleNewChat = () => {
     setActiveChatId(null);
     setSidebarOpen(false);
   };
-
-  // =========================================================
-  // SELECT CHAT
-  // =========================================================
 
   const handleSelectChat = (chatId) => {
     setActiveChatId(chatId);
@@ -162,9 +138,6 @@ useEffect(() => {
         (chat) => chat.id === chatWithTimestamp.id
       );
 
-      // Existing chat:
-      // remove it from its old position
-      // and move it to the top.
       if (existingChat) {
         const otherChats = prevChats.filter(
           (chat) => chat.id !== chatWithTimestamp.id
@@ -173,16 +146,11 @@ useEffect(() => {
         return [chatWithTimestamp, ...otherChats];
       }
 
-      // New chat is added at the top.
       return [chatWithTimestamp, ...prevChats];
     });
 
     setActiveChatId(chatWithTimestamp.id);
   };
-
-  // =========================================================
-  // DELETE CHAT
-  // =========================================================
 
   const handleDeleteChat = async (chatId) => {
     try {
@@ -209,13 +177,7 @@ useEffect(() => {
       console.error("Failed to delete chat:", error);
     }
 
-    // The active-chat validation effect
-    // will automatically select another chat.
   };
-
-  // =========================================================
-  // DELETE ALL CHATS
-  // =========================================================
 
   const handleDeleteAllChats = () => {
     console.log("Deleting all chats");
@@ -223,10 +185,6 @@ useEffect(() => {
     setChats([]);
     setActiveChatId(null);
   };
-
-  // =========================================================
-  // RENAME CHAT
-  // =========================================================
 
   const handleRenameChat = (chatId, newTitle) => {
     setChats((prevChats) =>
@@ -242,17 +200,9 @@ useEffect(() => {
     );
   };
 
-  // =========================================================
-  // ACTIVE CHAT
-  // =========================================================
-
   const activeChat = chats.find(
     (chat) => chat.id === activeChatId
   );
-
-  // =========================================================
-  // UI
-  // =========================================================
 
   return (
     <div
@@ -269,10 +219,7 @@ useEffect(() => {
         dark:bg-[#090b0d]
       "
     >
-      {/* ===================================================== */}
-      {/* BACKGROUND EFFECTS */}
-      {/* ===================================================== */}
-
+   
       <div
         className="
           pointer-events-none
@@ -324,12 +271,7 @@ useEffect(() => {
           "
         />
       </div>
-
-      {/* ===================================================== */}
-      {/* MAIN CONTAINER */}
-      {/* ===================================================== */}
-
-      <div
+    <div
         className="
   relative
   flex
@@ -349,9 +291,6 @@ useEffect(() => {
   dark:bg-[#111416]/90
 "
       >
-        {/* =================================================== */}
-        {/* MOBILE MENU BUTTON */}
-        {/* =================================================== */}
 
         <button
           type="button"
@@ -400,9 +339,7 @@ useEffect(() => {
           <Menu size={21} />
         </button>
 
-        {/* =================================================== */}
         {/* SIDEBAR */}
-        {/* =================================================== */}
 
         <Sidebar
           onNewChat={handleNewChat}
@@ -419,9 +356,7 @@ useEffect(() => {
 
         />
 
-        {/* =================================================== */}
         {/* CHAT */}
-        {/* =================================================== */}
 
         <main
   className="

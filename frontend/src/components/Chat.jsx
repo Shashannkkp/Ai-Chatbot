@@ -259,10 +259,6 @@ if (!response.ok) {
         </div>
       </header>
 
-      {/*
-        Empty chat: welcome screen and composer are centered together.
-        Active chat: messages scroll separately and composer stays at bottom.
-      */}
       {hasMessages ? (
         <>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-5 sm:px-5 sm:py-6 md:px-8">

@@ -36,12 +36,8 @@ function Sidebar({
 }) {
   const { user, login, logout } = useAuth();
 
-  // ================= PROFILE =================
-
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
-
-  // ================= AUTH =================
 
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState("login");
@@ -53,20 +49,14 @@ function Sidebar({
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState("");
 
-  // ================= RENAME =================
-
   const [editingChatId, setEditingChatId] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
   const renameInputRef = useRef(null);
-
-// ================= SEARCH =================
 
 const [searchQuery, setSearchQuery] = useState("");
 const [searchViewOpen, setSearchViewOpen] = useState(false);
 
 const searchInputRef = useRef(null);
-
-  // ================= CLOSE PROFILE =================
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -88,8 +78,6 @@ const searchInputRef = useRef(null);
     };
   }, []);
 
-  // ================= FOCUS RENAME =================
-
   useEffect(() => {
     if (editingChatId && renameInputRef.current) {
       renameInputRef.current.focus();
@@ -97,22 +85,16 @@ const searchInputRef = useRef(null);
     }
   }, [editingChatId]);
 
-  // ================= CLOSE SIDEBAR =================
-
   const closeSidebar = () => {
     if (setSidebarOpen) {
       setSidebarOpen(false);
     }
   };
 
-  // ================= NEW CHAT =================
-
   const handleNewChatClick = () => {
     onNewChat();
     closeSidebar();
   };
-
-  // ================= SELECT CHAT =================
 
   const handleSelectChatClick = (chatId) => {
     if (editingChatId === chatId) {
@@ -122,8 +104,6 @@ const searchInputRef = useRef(null);
     onSelectChat(chatId);
     closeSidebar();
   };
-
-  // ================= SEARCH VIEW =================
 
 const openSearchView = () => {
   setSearchViewOpen(true);
@@ -140,8 +120,6 @@ const handleSearchResultClick = (chatId) => {
   closeSearchView();
 };
 
-  // ================= DELETE CHAT =================
-
   const handleDeleteChatClick = (event, chatId) => {
     event.stopPropagation();
 
@@ -155,8 +133,6 @@ const handleSearchResultClick = (chatId) => {
     }
   };
 
-  // ================= RENAME START =================
-
   const handleRenameStart = (event, chat) => {
     event.stopPropagation();
 
@@ -166,16 +142,12 @@ const handleSearchResultClick = (chatId) => {
     );
   };
 
-  // ================= RENAME CANCEL =================
-
   const handleRenameCancel = (event) => {
     event.stopPropagation();
 
     setEditingChatId(null);
     setEditingTitle("");
   };
-
-  // ================= RENAME SAVE =================
 
   const handleRenameSave = (event, chatId) => {
     event.stopPropagation();
@@ -196,8 +168,6 @@ const handleSearchResultClick = (chatId) => {
     setEditingTitle("");
   };
 
-  // ================= RENAME KEYBOARD =================
-
   const handleRenameKeyDown = (event, chatId) => {
     if (event.key === "Enter") {
       handleRenameSave(event, chatId);
@@ -208,8 +178,6 @@ const handleSearchResultClick = (chatId) => {
     }
   };
 
-  // ================= AUTH OPEN =================
-
   const openAuth = (mode) => {
     setAuthMode(mode);
     setAuthError("");
@@ -219,8 +187,6 @@ const handleSearchResultClick = (chatId) => {
     setShowAuth(true);
     setProfileOpen(false);
   };
-
-  // ================= AUTH SUBMIT =================
 
   const handleAuthSubmit = async (event) => {
     event.preventDefault();
@@ -263,28 +229,23 @@ const handleSearchResultClick = (chatId) => {
     }
   };
 
-  // ================= LOGOUT =================
-
   const handleLogout = () => {
     setProfileOpen(false);
     logout();
   };
 
-  // ================= PROFILE =================
 
   const handleProfile = () => {
     setProfileOpen(false);
     console.log("Profile clicked");
   };
 
-  // ================= SETTINGS =================
 
   const handleSettings = () => {
     setProfileOpen(false);
     console.log("Settings clicked");
   };
 
-  // ================= CHAT TIME =================
 
   const formatChatTime = (timestamp) => {
     if (!timestamp) {
@@ -338,7 +299,6 @@ const handleSearchResultClick = (chatId) => {
     });
   };
 
-  // ================= FILTER CHATS =================
 
   const filteredChats = chats.filter((chat) => {
     const title =
@@ -354,7 +314,6 @@ const handleSearchResultClick = (chatId) => {
   return (
     
     <>
-      {/* ================= MOBILE OVERLAY ================= */}
       {sidebarOpen && (
         <div
           onClick={closeSidebar}
@@ -367,7 +326,6 @@ const handleSearchResultClick = (chatId) => {
         />
       )}
 
-      {/* ================= SIDEBAR ================= */}
 
       <aside
         className={`
@@ -706,8 +664,6 @@ overflow-hidden
 ) : (
   /* ================= NORMAL SIDEBAR VIEW ================= */
   <>
-    {/* ================= MENU ================= */}
-
     <p
       className="
         mb-1 px-2 text-base font-bold
@@ -830,9 +786,7 @@ overflow-hidden
 
 <div className="relative mt-2 shrink-0">
 
-        {/* ========================================================= */}
         {/* AUTH / USER SECTION */}
-        {/* ========================================================= */}
 
         <div
   ref={profileRef}
@@ -1136,9 +1090,7 @@ overflow-hidden
 </div>
       </aside>
 
-      {/* ========================================================= */}
       {/* LOGIN / REGISTER MODAL */}
-      {/* ========================================================= */}
 
       {showAuth && (
         <div
@@ -1363,9 +1315,7 @@ overflow-hidden
   );
 }
 
-/* ============================================================= */
 /* SIDEBAR ITEM */
-/* ============================================================= */
 
 function SidebarItem({ icon, text }) {
   return (
@@ -1403,9 +1353,7 @@ function SidebarItem({ icon, text }) {
   );
 }
 
-/* ============================================================= */
 /* EMPTY CHATS */
-/* ============================================================= */
 
 function EmptyChats({
   icon,

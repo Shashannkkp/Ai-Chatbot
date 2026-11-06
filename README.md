@@ -34,13 +34,13 @@ The project follows a separate frontend and backend architecture, with API endpo
 
 The Nova AI home screen featuring a clean interface and quick-start prompts.
 
-![Nova AI Main Workspace](./screenshots/UI1.png)
+![Nova AI Main Workspace](./screenshots/UI12.png)
 
 ### 💬 AI Conversation
 
 The conversation interface displaying AI-generated responses and chat functionality.
 
-![Nova AI Conversation](./screenshots/converstion1.png)
+![Nova AI Conversation](./screenshots/conversation1.png)
 
 ---
 

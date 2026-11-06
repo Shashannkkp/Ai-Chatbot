@@ -40,7 +40,7 @@ The Nova AI home screen featuring a clean interface and quick-start prompts.
 
 The conversation interface displaying AI-generated responses and chat functionality.
 
-![Nova AI Conversation](./screenshots/Converstion.png)
+![Nova AI Conversation](./screenshots/converstion1.png)
 
 ---
 

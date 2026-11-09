@@ -37,12 +37,17 @@ for (const variable of requiredVariables) {
 }
 
 // Import API handlers after loading environment variables
-const [{ default: authHandler }, { default: chatHandler }, { default: chatsHandler }] =
-  await Promise.all([
-    import("./api/auth.js"),
-    import("./api/chat.js"),
-    import("./api/chats.js"),
-  ]);
+const [
+  { default: authHandler },
+  { default: chatHandler },
+  { default: chatsHandler },
+  { default: knowledgeHandler },
+] = await Promise.all([
+  import("./api/auth.js"),
+  import("./api/chat.js"),
+  import("./api/chats.js"),
+  import("./api/knowledge.js"),
+]);
 
 // Health check
 app.get("/", (req, res) => {
@@ -55,6 +60,7 @@ app.get("/", (req, res) => {
 app.all("/api/auth", authHandler);
 app.all("/api/chat", chatHandler);
 app.all("/api/chats", chatsHandler);
+app.all("/api/knowledge", knowledgeHandler);
 
 // Handle unknown routes
 app.use((req, res) => {

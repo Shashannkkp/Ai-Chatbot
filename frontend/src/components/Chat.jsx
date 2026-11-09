@@ -12,6 +12,7 @@ import {
 import ChatInput from "./ChatInput";
 import Message from "./Message";
 import { useAuth } from "../context/AuthContext";
+import CustomScrollbar from "./CustomScrollbar";
 
 const API_URL = "/api/chat";
 
@@ -21,6 +22,7 @@ function Chat({ chat, onUpdateChat, darkMode, setDarkMode }) {
   const [messages, setMessages] = useState(chat?.messages || []);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesScrollRef = useRef(null);
   const hasMessages = messages.length > 0;
 
   useEffect(() => {

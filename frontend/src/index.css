@@ -78,22 +78,20 @@ div {
   }
 }
 
-/* Nova AI Chat Scrollbar */
-/* Nova AI Full Height Scrollbar */
-
 .chat-scrollbar {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(128, 128, 128, 0.12) transparent;
 }
 
 .chat-scrollbar::-webkit-scrollbar {
   width: 5px;
-  height: 100%;
 }
 
 .chat-scrollbar::-webkit-scrollbar-track {
   background: transparent;
-  margin: 0;
 }
 
 .chat-scrollbar::-webkit-scrollbar-thumb {

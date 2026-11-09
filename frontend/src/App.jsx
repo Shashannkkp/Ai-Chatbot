@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Menu, PanelLeftOpen, PanelLeftClose } from "lucide-react";
+import { Menu, PanelLeftOpen } from "lucide-react";
 
 import Sidebar from "./components/Sidebar";
 import Chat from "./components/Chat";

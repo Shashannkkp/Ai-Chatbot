@@ -188,28 +188,44 @@ function Message({ message, onEditMessage }) {
             {/* ================= MESSAGE BUBBLE ================= */}
 
             <div
-              className={`
-              relative overflow-hidden
-w-fit max-w-full
-rounded-2xl
-px-4 py-2
-                shadow-[0_6px_20px_rgba(0,0,0,0.04)]
-                transition-all
-                duration-300
+             className={`
+  relative
+  w-fit
+  max-w-full
+  overflow-hidden
+  rounded-2xl
+  px-4
+  py-3
+  transition-all
+  duration-300
 
-                ${
-                  isAI
-  ? `
-      rounded-none bg-transparent p-0 shadow-none
-      text-gray-800 dark:text-gray-200
-    `
-                    : `
-                     rounded-2xl bg-[#dbeafe] px-4 py-2
-text-gray-800 shadow-sm
-dark:bg-[#263b50] dark:text-gray-100
-                    `
-                }
-              `}
+  ${
+    isAI
+      ? `
+        rounded-none
+        bg-transparent
+        p-0
+        shadow-none
+        text-gray-800
+        dark:text-[#E5E7EB]
+      `
+      : `
+        rounded-2xl
+        border
+        border-blue-200/60
+        bg-[#DBEAFE]
+        px-4
+        py-3
+        text-gray-800
+        shadow-[0_2px_8px_rgba(0,0,0,0.03)]
+
+        dark:border-[#334155]
+        dark:bg-[#1E293B]
+        dark:text-[#F1F5F9]
+        dark:shadow-[0_4px_16px_rgba(0,0,0,0.12)]
+      `
+  }
+`}
             >
               {/* ================= AI GLOW ================= */}
 

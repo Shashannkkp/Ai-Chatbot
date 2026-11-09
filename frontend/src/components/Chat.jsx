@@ -261,7 +261,7 @@ if (!response.ok) {
 
       {hasMessages ? (
         <>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-5 sm:px-5 sm:py-6 md:px-8">
+          <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-5 sm:px-5 sm:py-6 md:px-8 chat-scrollbar">
             <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 pb-4 sm:gap-6">
               {messages.map((message) => (
                 <Message

@@ -42,11 +42,15 @@ const [
   { default: chatHandler },
   { default: chatsHandler },
   { default: knowledgeHandler },
+  { default: websiteHandler },
+  { default: githubHandler },
 ] = await Promise.all([
   import("./api/auth.js"),
   import("./api/chat.js"),
   import("./api/chats.js"),
   import("./api/knowledge.js"),
+  import("./api/website.js"),
+  import("./api/github.js")
 ]);
 
 // Health check
@@ -61,6 +65,8 @@ app.all("/api/auth", authHandler);
 app.all("/api/chat", chatHandler);
 app.all("/api/chats", chatsHandler);
 app.all("/api/knowledge", knowledgeHandler);
+app.all("/api/website", websiteHandler);
+app.all("/api/github", githubHandler);
 
 // Handle unknown routes
 app.use((req, res) => {

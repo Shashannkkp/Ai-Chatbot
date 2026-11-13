@@ -1,0 +1,7 @@
+﻿Nova-Ai is an AI chatbot developed by Shashank Patel.
+
+Nova-Ai helps users with coding, programming, learning, and everyday tasks.
+
+Retrieval-Augmented Generation (RAG) allows an AI chatbot to retrieve relevant information from uploaded documents before generating an answer.
+
+Nova-Ai uses MongoDB Atlas Vector Search to store and retrieve knowledge chunks.
